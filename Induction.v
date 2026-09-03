@@ -196,12 +196,28 @@ Abort.
     we must show [P(n') -> P(S n')].  Here's how this works for the
     theorem at hand... *)
 
+  Check nat_ind.
+
 Theorem add_0_r : forall n:nat, n + 0 = n.
 Proof.
   intros n. induction n as [| n' IHn'].
   - (* n = 0 *)    reflexivity.
   - (* n = S n' *) simpl. rewrite -> IHn'. reflexivity.  Qed.
 
+Theorem add_0_r_play : forall n:nat, n + 0 = n.
+Proof.
+  intros n. induction n as [| n' H].
+  - (* n = 0 *)    reflexivity.
+  - (* n = S n' *) simpl. rewrite -> H. reflexivity.  Qed.
+
+Theorem minus_n_n_play : forall n,
+  minus n n = 0.
+Proof.
+  intros n. 
+  Print minus.
+  induction n as [].
+  - reflexivity.
+  -  exact IHn. Qed. 
 (** Like [destruct], the [induction] tactic takes an [as...]
     clause that specifies the names of the variables to be introduced
     in the subgoals.  Since there are two subgoals, the [as...] clause
@@ -244,12 +260,20 @@ Proof.
 Theorem mul_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  (* FILL IN HERE *) intros n. induction n as [| n' H] .
+  reflexivity.
+  exact H. Qed.
+  
+  
 Theorem plus_n_Sm : forall n m : nat,
   S (n + m) = n + (S m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros n m.
+  induction m as [|m' H].
+  induction n as [|n' H'].
+  reflexivity.
+  simpl. rewrite <- H'. reflexivity. 
+  rewrite <- H.
 
 Theorem add_comm : forall n m : nat,
   n + m = m + n.
