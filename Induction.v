@@ -143,6 +143,7 @@ From LF Require Export Basics.
     using just [reflexivity].  But the proof that it is also a neutral
     element on the _right_ ... *)
 
+       (* Search, Print to search *)
 Theorem add_0_r_firsttry : forall n:nat,
   n + 0 = n.
 
