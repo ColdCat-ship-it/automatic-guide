@@ -580,10 +580,10 @@ Theorem expand_para : forall m n: nat,
   m * S n = m + m * n.
 Proof. 
   
-  intros n m.
+  intros m n.
   induction m as [| m H].
-  - rewrite mul_0_r. rewrite mult_n_1. rewrite add_0_r. reflexivity.
-  - Admitted. 
+  - reflexivity.
+  - simpl. rewrite H. rewrite add_shuffle3. reflexivity. Qed.
 
   (* intros n m.
   replace (S n) with (n + 1).
@@ -721,8 +721,9 @@ Proof.
   (* FILL IN HERE *) intros b.
   induction b as [].
   - reflexivity.
-  - replace (B0 b) with b. rewrite <- IHb. reflexivity. 
-  - reflexivity.
+  - simpl. rewrite add_comm. reflexivity.
+  - simpl. rewrite IHb. simpl. rewrite add_comm. reflexivity.
+  Qed.
 
 
 (** [] *)
@@ -732,8 +733,12 @@ Proof.
 (** Write a function to convert natural numbers to binary numbers. *)
 
 Fixpoint nat_to_bin (n:nat) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
-
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match n with
+     | O => Z
+     | S n' => incr (nat_to_bin n')
+     end.
+  
 (** Prove that, if we start with any [nat], convert it to [bin], and
     convert it back, we get the same [nat] which we started with.
 
@@ -746,7 +751,11 @@ Fixpoint nat_to_bin (n:nat) : bin
 
 Theorem nat_bin_nat : forall n, bin_to_nat (nat_to_bin n) = n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro n.
+  induction n as [].
+  - reflexivity.
+  - simpl. rewrite bin_to_nat_pres_incr. rewrite IHn. reflexivity.
+Qed.
 
 (** [] *)
 
@@ -771,24 +780,37 @@ Abort.
 
 Lemma double_incr : forall n : nat, double (S n) = S (S (double n)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro n.
+  induction n as [].
+  - reflexivity.
+  - rewrite IHn. rewrite double_plus. rewrite double_plus. simpl. rewrite add_comm. replace ((S n) + n) with (S (n + n)). reflexivity. rewrite plus_n_Sm. rewrite add_comm. reflexivity. Qed.
 
 (** Now define a similar doubling function for [bin]. *)
 
 Definition double_bin (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match b with
+     | Z => Z
+    | B0 b => B0 (B0 b)
+     | B1 b => B0 (B1 b) 
+     end. 
 
 (** Check that your function correctly doubles zero. *)
 
 Example double_bin_zero : double_bin Z = Z.
-(* FILL IN HERE *) Admitted.
+(* FILL IN HERE *) Proof. reflexivity. Qed.  
 
 (** Prove this lemma, which corresponds to [double_incr]. *)
 
 Lemma double_incr_bin : forall b,
     double_bin (incr b) = incr (incr (double_bin b)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro b.
+  induction b as [].
+  - reflexivity.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+     Qed.
 
 (** [] *)
 
@@ -809,7 +831,7 @@ Abort.
     [double_bin] that might have failed to satisfy [double_bin_zero]
     yet otherwise seem correct. *)
 
-(* FILL IN HERE *)
+(* 0 <=> Z <=> B0 Z <=> B0 B0 Z etc.  *)
 
 (** To solve that problem, we can introduce a _normalization_ function
     that selects the simplest [bin] out of all the equivalent
@@ -827,7 +849,12 @@ Abort.
     try to "look ahead" at future bits. *)
 
 Fixpoint normalize (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THI=S LINE WITH ":= _your_definition_ ." *)
+  := match b with
+     | Z => Z
+     | B0 b' => double_bin (normalize b')
+     | B1 b' => incr ( double_bin (normalize b'))
+     end.
 
 (** It would be wise to do some [Example] proofs to check that your definition of
     [normalize] works the way you intend before you proceed. They won't be graded,
@@ -844,9 +871,20 @@ Fixpoint normalize (b:bin) : bin
     progress. We have one lemma for the [B0] case (which also makes
     use of [double_incr_bin]) and another for the [B1] case. *)
 
+Theorem bin_2 : forall n: nat, nat_to_bin(n * 2) = double_bin (nat_to_bin n).
+Proof. 
+  intro n.
+  induction n as [].
+  - reflexivity.
+  - simpl. rewrite IHn. rewrite double_incr_bin. reflexivity. Qed.
+
 Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro b.
+  induction b as [].
+  - reflexivity.
+  - simpl. rewrite <- IHb. rewrite bin_2. reflexivity.
+  - simpl. rewrite <- IHb. rewrite <- bin_2. rewrite add_comm. reflexivity. Qed. 
 
 (** [] *)
 
