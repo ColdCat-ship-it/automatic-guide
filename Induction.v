@@ -115,7 +115,7 @@ From LF Require Export Basics.
        file it may be because the "load path" for Rocq is not set up
        correctly.  The [Print LoadPath.] command may be helpful in
        sorting out such issues.
-
+mul_0_r
        In particular, if you see a message like
 
            Compiled library Foo makes inconsistent assumptions over
@@ -269,21 +269,29 @@ Theorem plus_n_Sm : forall n m : nat,
   S (n + m) = n + (S m).
 Proof.
   (* FILL IN HERE *) intros n m.
-  induction m as [|m' H].
-  induction n as [|n' H'].
-  reflexivity.
-  simpl. rewrite <- H'. reflexivity. 
-  rewrite <- H.
+  induction n as [| n' H].
+  - reflexivity.
+  - simpl. rewrite <- H. reflexivity. Qed.
 
 Theorem add_comm : forall n m : nat,
   n + m = m + n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros n m.
+  induction n as [| n' H].
+  - simpl. {induction m as [ |m' TH].
+  - reflexivity. 
+  - simpl. rewrite <- TH. reflexivity.   
+  }
+  - simpl. rewrite H. rewrite -> plus_n_Sm. reflexivity. Qed.
+
 
 Theorem add_assoc : forall n m p : nat,
   n + (m + p) = (n + m) + p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros n m p.
+  induction n as [|n' H]. 
+  -reflexivity.
+  -simpl. rewrite H. reflexivity. Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (double_plus)
@@ -300,7 +308,10 @@ Fixpoint double (n:nat) :=
 
 Lemma double_plus : forall n, double n = n + n .
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros n.
+  induction n as [|n' H].
+  - reflexivity.
+  - simpl. rewrite H. rewrite plus_n_Sm. reflexivity. Qed. 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (eqb_refl)
@@ -311,7 +322,10 @@ Proof.
 Theorem eqb_refl : forall n : nat,
   (n =? n) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros n.
+  induction n as [|n' H].
+  - reflexivity. 
+  - simpl. exact H. Qed. 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (even_S)
@@ -326,7 +340,7 @@ Proof.
 Theorem even_S : forall n : nat,
   even (S n) = negb (even n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) Admitted. 
 (** [] *)
 
 (* ################################################################# *)
@@ -349,6 +363,7 @@ Proof.
   - reflexivity.
   - rewrite add_comm. simpl. rewrite add_comm. reflexivity.
 Qed.
+
 
 (** The tactic [replace e1 with e2] tactic introduces two subgoals.
 
@@ -546,16 +561,49 @@ Definition manual_grade_for_eqb_refl_informal : option (nat*string) := None.
 Theorem add_shuffle3 : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  (* FILL IN HERE *) intros n m p.
+  induction n as [|n' H].
+  - reflexivity. 
+  - simpl. rewrite H. rewrite plus_n_Sm. reflexivity. Qed.
+ 
 (** Now prove commutativity of multiplication.  You will probably want
     to look for (or define and prove) a "helper" theorem to be used in
     the proof of this one. Hint: what is [n * (1 + k)]? *)
+Theorem in_para : forall m n: nat, 
+  S (m + n) = S m + n.
+Proof.
+  induction n as [|n H].
+  - rewrite add_0_r. rewrite add_0_r. reflexivity.
+  - rewrite add_comm. rewrite plus_n_Sm. rewrite add_comm. reflexivity. Qed.
+
+Theorem expand_para : forall m n: nat,
+  m * S n = m + m * n.
+Proof. 
+  
+  intros n m.
+  induction m as [| m H].
+  - rewrite mul_0_r. rewrite mult_n_1. rewrite add_0_r. reflexivity.
+  - Admitted. 
+
+  (* intros n m.
+  replace (S n) with (n + 1).
+  induction n as [| n H].
+  - reflexivity.
+  - rewrite <- in_para. { induction m as [|m' M].
+  - rewrite mult_n_1. rewrite mul_0_r. rewrite add_0_r. reflexivity.
+     - rewrite in_para. replace (S n) with n. exact H. *)
+
 
 Theorem mul_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros m n.
+  induction m as [|m' H].
+  - simpl. rewrite mul_0_r. reflexivity. 
+  - simpl. rewrite H. { induction n as [| n' M].
+    - reflexivity.
+    - rewrite expand_para. reflexivity. }
+  Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (more_exercises)
@@ -628,10 +676,21 @@ Inductive bin : Type :=
     be graded on its own. *)
 
 Fixpoint incr (m:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match m with
+     | Z => B1 Z
+     | B0 n => B1 n
+     | B1 n => B0 (incr n) 
+     end. 
 
 Fixpoint bin_to_nat (m:bin) : nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match m with
+     | Z => 0
+     | B0 n => bin_to_nat(n) * 2
+     | B1 n => bin_to_nat(n) * 2 + 1
+     end.
+
 
 (** In [Basics], we did some unit testing of [bin_to_nat], but we
     didn't prove its correctness. Now we'll do so. *)
@@ -659,7 +718,12 @@ Fixpoint bin_to_nat (m:bin) : nat
 Theorem bin_to_nat_pres_incr : forall b : bin,
   bin_to_nat (incr b) = 1 + bin_to_nat b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros b.
+  induction b as [].
+  - reflexivity.
+  - replace (B0 b) with b. rewrite <- IHb. reflexivity. 
+  - reflexivity.
+
 
 (** [] *)
 
