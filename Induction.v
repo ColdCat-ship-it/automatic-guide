@@ -579,11 +579,19 @@ Proof.
 Theorem expand_para : forall m n: nat,
   m * S n = m + m * n.
 Proof. 
+Proof.
+intros m n.
+induction m as [| m H].
+-reflexivity.
+-simpl.
+rewrite H.
+rewrite add_shuffle3. reflexivity.
+Qed.
   
-  intros n m.
+(* intros n m.
   induction m as [| m H].
   - rewrite mul_0_r. rewrite mult_n_1. rewrite add_0_r. reflexivity.
-  - Admitted. 
+  - rewrite -> H.  rewrite <- H.  *)
 
   (* intros n m.
   replace (S n) with (n + 1).
@@ -723,6 +731,7 @@ Proof.
   - reflexivity.
   - replace (B0 b) with b. rewrite <- IHb. reflexivity. 
   - reflexivity.
+  Admitted.
 
 
 (** [] *)
