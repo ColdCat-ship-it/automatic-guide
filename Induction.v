@@ -588,17 +588,11 @@ rewrite H.
 rewrite add_shuffle3. reflexivity.
 Qed.
   
-<<<<<<< HEAD
-  intros m n.
-  induction m as [| m H].
-  - reflexivity.
-  - simpl. rewrite H. rewrite add_shuffle3. reflexivity. Qed.
-=======
 (* intros n m.
   induction m as [| m H].
   - rewrite mul_0_r. rewrite mult_n_1. rewrite add_0_r. reflexivity.
   - rewrite -> H.  rewrite <- H.  *)
->>>>>>> cda01e332dd59a410543ca7f467f98acb6b0467a
+
 
   (* intros n m.
   replace (S n) with (n + 1).
@@ -736,15 +730,9 @@ Proof.
   (* FILL IN HERE *) intros b.
   induction b as [].
   - reflexivity.
-<<<<<<< HEAD
   - simpl. rewrite add_comm. reflexivity.
   - simpl. rewrite IHb. simpl. rewrite add_comm. reflexivity.
   Qed.
-=======
-  - replace (B0 b) with b. rewrite <- IHb. reflexivity. 
-  - reflexivity.
-  Admitted.
->>>>>>> cda01e332dd59a410543ca7f467f98acb6b0467a
 
 
 (** [] *)
