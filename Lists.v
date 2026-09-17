@@ -958,7 +958,9 @@ Theorem rev_aplus_cons (l : natlist) (n : nat):
   n :: l  = [n] ++ l.
 Proof. 
   reflexivity. Qed.
-  
+
+  Search (_ ++_ ).
+
 (** An _involution_ is a function that is its own inverse. That is,
     applying the function twice yield the original input. *)
 Theorem rev_involutive : forall l : natlist,
@@ -966,24 +968,32 @@ Theorem rev_involutive : forall l : natlist,
 Proof.
   (* FILL IN HERE *) induction l.
   - reflexivity.
-  -rewrite rev_aplus_cons.  rewrite rev_app_distr. reflexivity.  
+  -rewrite rev_aplus_cons.  rewrite rev_app_distr. rewrite rev_app_distr. rewrite IHl. reflexivity. Qed.
 
 (** There is a short solution to the next one.  If you find yourself
     getting tangled up, step back and try to look for a simpler
     way. *)
 
+    Check app_assoc. 
 Theorem app_assoc4 : forall l1 l2 l3 l4 : natlist,
   l1 ++ (l2 ++ (l3 ++ l4)) = ((l1 ++ l2) ++ l3) ++ l4.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *)
+  intros l1 l2 l3 l4.
+  rewrite app_assoc. rewrite app_assoc. reflexivity.
+Qed.
 
-(** An exercise about your implementation of [nonzeros]: *)
+(** An exercise about your implementation of [nonzeros]: *) 
 
 Lemma nonzeros_app : forall l1 l2 : natlist,
   nonzeros (l1 ++ l2) = (nonzeros l1) ++ (nonzeros l2).
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) 
+  intros l2 l1. 
+  induction l2.
+  - reflexivity.  
+  - Admitted.
+  (** [] **)
 
 (** **** Exercise: 2 stars, standard (eqblist)
 
@@ -992,24 +1002,32 @@ Proof.
     yields [true] for every list [l]. *)
 
 Fixpoint eqblist (l1 l2 : natlist) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match l1, l2 with
+     | [], [] => true
+     | n1 :: s1, n2 :: s2 => if n1 =? n2 then eqblist s1 s2 else false
+     | _, _ => false
+  end.
 
 Example test_eqblist1 :
   (eqblist nil nil = true).
- (* FILL IN HERE *) Admitted.
+ (* FILL IN HERE *) Proof. reflexivity. Qed. 
 
 Example test_eqblist2 :
   eqblist [1;2;3] [1;2;3] = true.
-(* FILL IN HERE *) Admitted.
+ (* FILL IN HERE *) Proof. reflexivity. Qed. 
 
 Example test_eqblist3 :
   eqblist [1;2;3] [1;2;4] = false.
- (* FILL IN HERE *) Admitted.
+ (* FILL IN HERE *) Proof. reflexivity. Qed. 
 
 Theorem eqblist_refl : forall l:natlist,
   true = eqblist l l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro l.
+  induction l.
+  - reflexivity. 
+  -  rewrite rev_aplus_cons. Admitted.    
 (** [] *)
 
 (* ================================================================= *)
