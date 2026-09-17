@@ -18,3 +18,19 @@ series.
 
   - LICENSE
     Explanation of how these files may be redistributed
+
+Building the Lists homework
+--------------------------
+Use Rocq 9.0.0. If installed with opam, activate your switch first:
+
+    eval "$(opam env)"
+    make Lists.vo ListsTest.vo
+
+This builds Basics.v and Induction.v before Lists.v, then runs ListsTest.v.
+Unfinished exercises remain Admitted; a successful build does not mean
+that all exercises are complete. Read the test output for remaining axioms.
+
+Makefile.coq, Makefile.coq.conf, and .Makefile.coq.d are generated locally
+and ignored by Git because they contain paths specific to each machine.
+When moving an existing checkout to another machine, run `make clean`
+before building to discard its old generated files.
