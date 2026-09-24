@@ -1042,12 +1042,19 @@ Proof.
 
 Definition fold_map {X Y: Type} (f: X -> Y) (l: list X) : list Y
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) 
-  . Admitted. 
+  := fold (fun x result => f x :: result) l []. 
 (** Write down a theorem [fold_map_correct] stating that [fold_map] is
     correct, and prove it in Rocq.  (Hint: again, remember that
     [unfold]ing before [simpl]ifying may help.) *)
 
 (* FILL IN HERE *)
+Theorem fold_map_correct : forall {X Y: Type} (l : list X) (f: X -> Y),
+  fold_map f l = map f l.
+Proof.
+  intros. 
+  induction l. 
+  - reflexivity.
+  - simpl. rewrite <- IHl. reflexivity. Qed.   
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_fold_map : option (nat*string) := None.
