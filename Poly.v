@@ -1290,17 +1290,18 @@ Proof. (* FILL IN HERE *) reflexivity. Qed.
     unchanged. *)
 
 Definition mult (n m : cnat) : cnat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
-  := 
-
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) 
+  := (* fun (X : Type) (succ : cnat fun (X: Type) (next : X -> X) (k : X) => (m X next k )) (zero : X) => (n X succ zero). *)
+  fun (X : Type) (succ :  X -> X ) (zero : X) => (m X (n X succ) zero).  
+ 
 Example mult_1 : mult one one = one.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed. 
 
 Example mult_2 : mult zero (plus three three) = zero.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed. 
 
 Example mult_3 : mult two three = plus three three.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed. 
 
 (** [] *)
 
@@ -1316,16 +1317,18 @@ Proof. (* FILL IN HERE *) Admitted.
     Finding the right type can be tricky. *)
 
 Definition exp (n m : cnat) : cnat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := fun (X:Type) (succ:X->X) (zero:X) => m (X -> X) (n X) succ zero.
 
+Compute exp two three. 
 Example exp_1 : exp two two = plus two two.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 Example exp_2 : exp three zero = one.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 Example exp_3 : exp three two = plus (mult two (mult two two)) one.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 (** [] *)
 

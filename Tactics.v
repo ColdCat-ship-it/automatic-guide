@@ -31,7 +31,7 @@ Proof.
 
 (** Here, we could finish with "[rewrite -> eq.  reflexivity.]" as we
     have done several times before.  Or we can finish in a single step
-    by using [apply]: *)
+    by using [apply]: or u can use exact *)
 
   apply eq.  Qed.
 
@@ -77,7 +77,9 @@ Theorem silly_ex : forall p,
   even p = true ->
   odd (S p) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+   apply H0. 
+   apply H. apply H1. Qed.   
 (** [] *)
 
 (** To use the [apply] tactic, the (conclusion of the) fact
@@ -98,7 +100,7 @@ Proof.
   (** ...but we can use the [symmetry] tactic, which switches the left
       and right sides of an equality in the goal. *)
 
-  symmetry. apply H.  Qed.
+symmetry. apply H.  Qed. (*eq_sym also works *) 
 
 (** **** Exercise: 2 stars, standard (apply_exercise1)
 
@@ -108,12 +110,19 @@ Proof.
     that theorem as part of your (relatively short) solution to this
     exercise. You do not need [induction]. *)
 
+Search "rev" inside Lists.  
+Search "rev". 
 Theorem rev_exercise1 : forall (l l' : list nat),
   l = rev l' ->
   l' = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) intros.
+  rewrite <- rev_involutive in l'.  
+   
+(** [apply somethign with somthin
+  @trans_eq _ _  [c; d]
+
+  congruence (congruence closure algo).  *)
 
 (** **** Exercise: 1 star, standard, optional (apply_rewrite)
 
@@ -195,8 +204,10 @@ Example trans_eq_exercise : forall (n m o p : nat),
      (n + p) = m ->
      (n + p) = (minustwo o).
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) intros.
+  transitivity (m). apply H0. apply H. Qed. 
+  
+  (** [] *)
 
 (* ################################################################# *)
 (** * The [injection] and [discriminate] Tactics *)
@@ -267,6 +278,7 @@ Proof.
   injection H as Hnm. apply Hnm.
 Qed.
 
+Print S_injective'. 
 (** Here's a more interesting example that shows how [injection] can
     derive multiple equations at once. *)
 
@@ -286,9 +298,14 @@ Example injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   j = z :: l ->
   x = y.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) intros.
+  injection H. intros.
+  rewrite H0 in H1. 
+  symmetry in H2. rewrite H2 in H1. injection H1. 
+  intros. symmetry. exact H3. Qed. 
+(** [] *) 
 
+  Print injection_ex3. 
 (** So much for injectivity of constructors.  What about disjointness? *)
 
 (** The principle of disjointness says that two terms beginning
@@ -328,6 +345,9 @@ Proof.
 
     We'll explore the principle of explosion in more detail in the
     next chapter. *)
+  Print False.
+  Check False_ind. 
+  Print discriminate.  
 
 (** **** Exercise: 1 star, standard (discriminate_ex3) *)
 Example discriminate_ex3 :
@@ -335,7 +355,8 @@ Example discriminate_ex3 :
     x :: y :: l = [] ->
     x = z.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  discriminate H.  Qed. 
 (** [] *)
 
 (** For a more useful example, we can use [discriminate] to make a
@@ -374,8 +395,9 @@ Qed.
 
 Theorem f_equal : forall (A B : Type) (f: A -> B) (x y: A),
   x = y -> f x = f y.
-Proof. intros A B f x y eq. rewrite eq.  reflexivity.  Qed.
+   Proof. intros A B f x y eq. rewrite eq.  reflexivity.  Qed.
 
+Print f_equal. 
 Theorem eq_implies_succ_equal : forall (n m : nat),
   n = m -> S n = S m.
 Proof. intros n m H. apply f_equal. apply H. Qed.
@@ -475,7 +497,12 @@ Lemma nth_error_always_none: forall (l : list nat),
   (forall i, nth_error l i = None) ->
   l = [].
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+
+  (**intros.
+  induction l.
+  - reflexivity. 
+     - rewrite IHl in H. simpl in *.   *)
 (** [] *)
 
 (** Using [specialize] before [apply] gives us yet another way to
