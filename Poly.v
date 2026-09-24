@@ -1235,7 +1235,8 @@ Proof. reflexivity. Qed.
     output. In other words, do it [n] times, then do it once more. *)
 
 Definition scc (n : cnat) : cnat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := fun (X : Type) (succ : X -> X) (zero : X) => succ (n X succ zero).
 
 Example scc_1 : scc zero = one.
 Proof. (* FILL IN HERE *) reflexivity. Qed. 
@@ -1259,17 +1260,18 @@ Proof. (* FILL IN HERE *) reflexivity. Qed.
     [x]. *)
 
 Definition plus (n m : cnat) : cnat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := fun (X : Type) (succ : X -> X) (zero : X) => (n X succ (m X succ zero)).
 
 Example plus_1 : plus zero one = one.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 Example plus_2 : plus two three = plus three two.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 Example plus_3 :
   plus (plus two two) three = plus one (plus three three).
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) reflexivity. Qed. 
 
 (** [] *)
 
@@ -1288,7 +1290,8 @@ Proof. (* FILL IN HERE *) Admitted.
     unchanged. *)
 
 Definition mult (n m : cnat) : cnat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := 
 
 Example mult_1 : mult one one = one.
 Proof. (* FILL IN HERE *) Admitted.
