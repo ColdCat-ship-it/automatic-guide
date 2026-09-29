@@ -117,7 +117,7 @@ Theorem rev_exercise1 : forall (l l' : list nat),
   l' = rev l.
 Proof.
   (* FILL IN HERE *) intros.
-  rewrite <- rev_involutive in l'.  
+  rewrite H. rewrite rev_involutive. reflexivity. Qed.   
    
 (** [apply somethign with somthin
   @trans_eq _ _  [c; d]
@@ -498,7 +498,11 @@ Lemma nth_error_always_none: forall (l : list nat),
   l = [].
 Proof.
   (* FILL IN HERE *) 
-
+  intros.
+  specialize H with (i := 0). 
+  destruct l. 
+  - reflexivity. 
+  - discriminate H. Qed.  
   (**intros.
   induction l.
   - reflexivity. 
