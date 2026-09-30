@@ -685,8 +685,16 @@ Proof.
 Theorem eqb_true : forall n m,
   n =? m = true -> n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) 
+  intro n.
+  induction n.
+  - intro m. destruct m. 
+    + reflexivity.
+    + intros. discriminate H.  
+  - destruct m. 
+    + intros. discriminate H.
+    + simpl. intros. simpl. f_equal. apply IHn. apply H. Qed.    
+(** [specialize H with () as H1] *)
 
 (** **** Exercise: 2 stars, advanced, optional (eqb_true_informal)
 
@@ -708,7 +716,10 @@ Theorem plus_n_n_injective : forall n m,
   n + n = m + m ->
   n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro n. 
+  induction n.
+  - destruct m. reflexivity. intro H. discriminate H.
+  - destruct m. discriminate. intro H. Admitted.   
 (** [] *)
 
 (** The strategy of doing fewer [intros] before an [induction] to
