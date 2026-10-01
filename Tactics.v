@@ -708,6 +708,8 @@ Proof.
 Definition manual_grade_for_informal_proof : option (nat*string) := None.
 (** [] *)
 
+
+Search  (_ + S _). 
 (** **** Exercise: 3 stars, standard, especially useful (plus_n_n_injective)
 
     In addition to being careful about how you use [intros], practice
@@ -719,7 +721,8 @@ Proof.
   (* FILL IN HERE *) intro n. 
   induction n.
   - destruct m. reflexivity. intro H. discriminate H.
-  - destruct m. discriminate. intro H. Admitted.   
+  - destruct m. discriminate. simpl. intro H. injection H. rewrite <- plus_n_Sm. rewrite <- plus_n_Sm. intro Hn. f_equal. injection Hn. apply IHn.  Qed.            
+
 (** [] *)
 
 (** The strategy of doing fewer [intros] before an [induction] to
@@ -861,6 +864,9 @@ Proof.
       * apply H.
 Qed.
 
+Search "nth_error".
+Check nth_error_always_none. 
+Print nth_error_always_none. 
 (** **** Exercise: 3 stars, standard, especially useful (gen_dep_practice)
 
     Prove this by induction on [l]. *)
@@ -869,7 +875,10 @@ Theorem nth_error_after_last: forall (n : nat) (X : Type) (l : list X),
   length l = n ->
   nth_error l n = None.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intro l.
+  induction l. 
+  -  intros. destruct l. reflexivity. discriminate.
+  - intros. destruct l0. discriminate. simpl. rewrite IHl. reflexivity. injection H. intro. exact H0. Qed.    
 (** [] *)
 
 (* ################################################################# *)
@@ -1057,7 +1066,11 @@ Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold combine. intros. destruct l.
+  -   Admitted.
+  (* FILL IN HERE *) (*unfold split. intros. destruct l. 
+  - destruct l1. reflexivity. discriminate.
+                        - simpl. rewrite <- H.*) 
 (** [] *)
 
 (** The [eqn:] part of the [destruct] tactic is optional; although
@@ -1126,12 +1139,15 @@ Proof.
           rewrite -> Heqe5. reflexivity.
         + (* e5 = false *) discriminate eq.  Qed.
 
+          Search ( bool -> bool). 
+Check  identity_fn_applied_twice. 
 (** **** Exercise: 2 stars, standard (destruct_eqn_practice) *)
 Theorem bool_fn_applied_thrice :
   forall (f : bool -> bool) (b : bool),
   f (f (f b)) = f b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *)intros. destruct (f b).
+  - Admitted.
 (** [] *)
 
 (* ################################################################# *)
@@ -1218,7 +1234,9 @@ Proof.
 Theorem eqb_sym : forall (n m : nat),
   (n =? m) = (m =? n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) induction n. 
+  - destruct m. reflexivity. reflexivity.
+  - destruct m. reflexivity. apply IHn. Qed.                 
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, optional (eqb_sym_informal)
@@ -1233,13 +1251,14 @@ Proof.
 
     [] *)
 
+    Check trans_eq.
 (** **** Exercise: 3 stars, standard, optional (eqb_trans) *)
 Theorem eqb_trans : forall n m p,
   n =? m = true ->
-  m =? p = true ->
+  m =? p = true -> 
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. generalize dependent m. Admitted. 
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine)
