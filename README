@@ -27,7 +27,11 @@ Use Rocq 9.0.0. If installed with opam, activate your switch first:
     make Lists.vo ListsTest.vo Poly.vo PolyTest.vo Tactics.vo TacticsTest.vo
 
 The build compiles the required earlier chapters automatically. For just
-one chapter, use e.g. `make Tactics.vo TacticsTest.vo`.
+one chapter, use e.g. `make Tactics.vo TacticsTest.vo`. To compile every
+chapter and its test file, including the unfinished chapters, run:
+
+    opam exec -- make build
+
 Unfinished exercises remain Admitted; a successful build does not mean
 that all exercises are complete. Read the test output for remaining axioms.
 
@@ -39,10 +43,30 @@ vsrocq-language-server installed in your opam switch. Set `vsrocq.path`
 in your user settings to the output of `opam var bin` plus `/vsrocqtop`.
 
 With a .v file active, Cmd+Shift+B builds that chapter and its dependencies.
-The "Rocq: check current homework" task also runs the Lists, Poly, and
-Tactics test files. Both tasks use `opam exec` to select the switch's tools.
+Run "Tasks: Run Task" from the command palette and choose "Rocq: build
+all chapters" to compile the entire book. The "Rocq: check current
+homework" task runs the Lists, Poly, and Tactics test files. All these
+tasks use `opam exec` to select the switch's tools.
 
 Makefile.coq, Makefile.coq.conf, and .Makefile.coq.d are generated locally
 and ignored by Git because they contain paths specific to each machine.
 When moving an existing checkout to another machine, run `make clean`
 before building to discard its old generated files.
+
+Earlier chapter definitions
+---------------------------
+The main sequence already uses `Require Export` for its prerequisites:
+
+    Basics -> Induction -> Lists -> Poly -> Tactics -> Logic -> IndProp
+           -> ProofObjects -> IndPrinciples
+
+For example, `From LF Require Export Tactics.` in Logic.v also makes
+Poly and the earlier chapters available. Rebuild after editing an earlier
+chapter so later files load its current compiled definitions. Helpers
+inside nested modules still need their module name, such as
+`NatList.hp_eq_refl` from Lists.v.
+
+Keep each chapter's existing imports. Importing every file into every
+other file creates circular dependencies. Maps and several later chapters
+intentionally use the standard library instead of the earlier chapters'
+custom definitions; blanket exports can make their types conflict.

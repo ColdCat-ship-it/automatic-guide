@@ -21,6 +21,22 @@
       "problemMatcher": []
     },
     {
+      "label": "Rocq: build all chapters",
+      "type": "shell",
+      "command": "opam",
+      "args": [
+        "exec",
+        "--",
+        "make",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "Rocq: check current homework",
       "type": "shell",
       "command": "opam",
