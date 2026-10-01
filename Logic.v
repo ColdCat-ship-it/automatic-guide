@@ -81,8 +81,12 @@ Definition injective {A B} (f : A -> B) : Prop :=
 
 Lemma succ_inj : injective S.
 Proof.
+  (* unfold injective. intros.  *)
   intros x y H. injection H as H1. apply H1.
 Qed.
+
+Print eq.
+Check eq_ind. 
 
 (** The familiar equality operator [=] is a (binary) function that returns
     a [Prop].
@@ -141,10 +145,14 @@ Qed.
 
 (** **** Exercise: 2 stars, standard (plus_is_O) *)
 
+Search (_+0).
+Search (_+S _).
 Example plus_is_O :
   forall n m : nat, n + m = 0 -> n = 0 /\ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) split.
+  - destruct m. rewrite add_0_r in H. apply H. rewrite <- plus_n_Sm in H. discriminate.
+  - destruct m. reflexivity. rewrite <- plus_n_Sm in H. discriminate. Qed.     
 (** [] *)
 
 (** So much for proving conjunctive statements.  To go in the other
@@ -221,7 +229,8 @@ Proof.
 Lemma proj2 : forall P Q : Prop,
   P /\ Q -> Q.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. destruct H. 
+  apply H0. Qed. 
 (** [] *)
 
 (** Finally, we sometimes need to rearrange the order of conjunctions
@@ -247,7 +256,9 @@ Theorem and_assoc : forall P Q R : Prop,
   P /\ (Q /\ R) -> (P /\ Q) /\ R.
 Proof.
   intros P Q R [HP [HQ HR]].
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) split. 
+  - split. exact HP. exact HQ. 
+  - exact HR. Qed.  
 (** [] *)
 
 (** The infix notation [/\] is actually just syntactic sugar for
@@ -316,11 +327,14 @@ Proof.
   - right. reflexivity.
 Qed.
 
+Search (_*_ = 0). 
 (** **** Exercise: 2 stars, standard (mult_is_O) *)
 Lemma mult_is_O :
   forall n m, n * m = 0 -> n = 0 \/ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. destruct n.
+  - left. reflexivity.   
+  - destruct m. right. reflexivity. Admitted.      
 (** [] *)
 
 (** **** Exercise: 1 star, standard (or_commut) *)
