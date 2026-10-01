@@ -1,7 +1,0 @@
-
-
-a < b \iff b >= a
-
-a <= b && negb b == a?
-
-negb b <= a \iff b > a != b >= a

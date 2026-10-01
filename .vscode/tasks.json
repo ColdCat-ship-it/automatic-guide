@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Rocq: build current file",
+      "type": "shell",
+      "command": "opam",
+      "args": [
+        "exec",
+        "--",
+        "make",
+        "${fileBasenameNoExtension}.vo"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Rocq: check current homework",
+      "type": "shell",
+      "command": "opam",
+      "args": [
+        "exec",
+        "--",
+        "make",
+        "Lists.vo",
+        "ListsTest.vo",
+        "Poly.vo",
+        "PolyTest.vo",
+        "Tactics.vo",
+        "TacticsTest.vo"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

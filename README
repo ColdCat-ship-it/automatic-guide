@@ -19,16 +19,28 @@ series.
   - LICENSE
     Explanation of how these files may be redistributed
 
-Building the Lists homework
---------------------------
+Building and checking the homework
+----------------------------------
 Use Rocq 9.0.0. If installed with opam, activate your switch first:
 
     eval "$(opam env)"
-    make Lists.vo ListsTest.vo
+    make Lists.vo ListsTest.vo Poly.vo PolyTest.vo Tactics.vo TacticsTest.vo
 
-This builds Basics.v and Induction.v before Lists.v, then runs ListsTest.v.
+The build compiles the required earlier chapters automatically. For just
+one chapter, use e.g. `make Tactics.vo TacticsTest.vo`.
 Unfinished exercises remain Admitted; a successful build does not mean
 that all exercises are complete. Read the test output for remaining axioms.
+
+Working in VS Code on macOS
+--------------------------
+Open this entire folder in VS Code, so VsRocq reads `_CoqProject` and its
+`-Q . LF` library mapping. Use the VsRocq extension with a matching
+vsrocq-language-server installed in your opam switch. Set `vsrocq.path`
+in your user settings to the output of `opam var bin` plus `/vsrocqtop`.
+
+With a .v file active, Cmd+Shift+B builds that chapter and its dependencies.
+The "Rocq: check current homework" task also runs the Lists, Poly, and
+Tactics test files. Both tasks use `opam exec` to select the switch's tools.
 
 Makefile.coq, Makefile.coq.conf, and .Makefile.coq.d are generated locally
 and ignored by Git because they contain paths specific to each machine.
