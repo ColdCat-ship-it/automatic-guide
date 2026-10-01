@@ -1061,7 +1061,7 @@ Check bag. Check Set.
 Theorem count_member_nonzero : forall (s : bag),
   1 <=? (count 1 (1 :: s)) = true.
 Proof.
-intros s.
+intros s. simpl. reflexivity. Qed.
 
 (** [] *)
 
