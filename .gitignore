@@ -1,0 +1,16 @@
+# Generate the build configuration on each machine.
+Makefile.coq
+Makefile.coq.conf
+.Makefile.coq.d
+
+# Rocq compiler and editor outputs.
+*.vo
+*.vos
+*.vok
+*.glob
+.*.aux
+.lia.cache
+.nia.cache
+.rocq-native/
+.coq-native/
+.DS_Store

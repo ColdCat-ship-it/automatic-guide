@@ -1059,6 +1059,9 @@ Fixpoint split {X Y : Type} (l : list (X*Y))
       end
   end.
 
+
+
+Check combine.
 (** Prove that [split] and [combine] are inverses in the following
     sense: *)
 
@@ -1066,8 +1069,18 @@ Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  unfold combine. intros. destruct l.
-  -   Admitted.
+  intros X Y l.
+  induction l as [| [x y] t IH]; intros l1 l2 H.
+  - inversion H. reflexivity.
+  - simpl in H.
+    destruct (split t) as [tx ty] eqn:Hs.
+    injection H as H1 H2.
+    subst l1 l2.
+    simpl.
+    f_equal.
+    apply IH.
+    reflexivity.
+Qed.
   (* FILL IN HERE *) (*unfold split. intros. destruct l. 
   - destruct l1. reflexivity. discriminate.
                         - simpl. rewrite <- H.*) 
@@ -1251,14 +1264,18 @@ Proof.
 
     [] *)
 
-    Check trans_eq.
+Check trans_eq.
+Check eqb_true.
+Search "hp_".
 (** **** Exercise: 3 stars, standard, optional (eqb_trans) *)
 Theorem eqb_trans : forall n m p,
   n =? m = true ->
   m =? p = true -> 
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) intros. generalize dependent m. Admitted. 
+  (* FILL IN HERE *) intros. apply eqb_true in H. apply eqb_true in H0. rewrite H0 in H. rewrite H. 
+  rewrite NatList.hp_eq_refl. reflexivity. Qed.
+
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine)

@@ -968,7 +968,8 @@ Theorem rev_involutive : forall l : natlist,
 Proof.
   (* FILL IN HERE *) induction l.
   - reflexivity.
-  -rewrite rev_aplus_cons.  rewrite rev_app_distr. rewrite rev_app_distr. rewrite IHl. reflexivity. Qed.
+  -rewrite rev_aplus_cons.  rewrite rev_app_distr. rewrite rev_app_distr. rewrite IHl. reflexivity. 
+  Qed.
 
 (** There is a short solution to the next one.  If you find yourself
     getting tangled up, step back and try to look for a simpler
@@ -983,17 +984,24 @@ Proof.
   rewrite app_assoc. rewrite app_assoc. reflexivity.
 Qed.
 
+Check nonzeros. Search nonzeros.
+
 (** An exercise about your implementation of [nonzeros]: *) 
 
 Lemma nonzeros_app : forall l1 l2 : natlist,
   nonzeros (l1 ++ l2) = (nonzeros l1) ++ (nonzeros l2).
 Proof.
   (* FILL IN HERE *) 
-  intros l1 l2. 
+  intros l1 l2.
   induction l1 as [| n l1' IH].
+  - reflexivity.
+  - destruct n. simpl. rewrite <- IH. reflexivity. simpl. rewrite IH. reflexivity.
+  Qed.
+
+(*  intros l2 l1. 
+  induction l2.
   - reflexivity.  
-  - destruct n. simpl. rewrite <- IH. reflexivity. simpl. rewrite IH. reflexivity. 
-Qed.
+  - induction l1.  *)
   (** [] **)
 
 (** **** Exercise: 2 stars, standard (eqblist)
@@ -1022,24 +1030,25 @@ Example test_eqblist3 :
   eqblist [1;2;3] [1;2;4] = false.
  (* FILL IN HERE *) Proof. reflexivity. Qed. 
 
-Theorem hp_eq_ref1: forall n : nat,
-   (n =? n) = true.
-Proof. 
-  intros n.
-  induction n as [| n' IH]. 
-  - reflexivity. 
-  - simpl. exact IH.
-Qed. 
+Theorem hp_eq_refl : forall n : nat, 
+  (n =? n) = true.
+Proof.
+intros n.
+induction n as [| n' IH].
+- reflexivity. 
+- simpl. exact IH.
+Qed.
+
 
 Theorem eqblist_refl : forall l:natlist,
   true = eqblist l l.
 Proof.
   (* FILL IN HERE *) intro l.
-  induction l.
+  induction l as [|n l IH].
   - reflexivity. 
-  -  destruct n. rewrite IHl. reflexivity. rewrite IHl. simpl.
-    destruct n. reflexivity. rewrite hp_eq_ref1. reflexivity.
-Qed. 
+  - destruct n. rewrite IH. reflexivity. rewrite IH. simpl. 
+  destruct n. reflexivity. simpl. rewrite hp_eq_refl. reflexivity.
+  Qed. 
 (** [] *)
 
 (* ================================================================= *)
@@ -1047,12 +1056,13 @@ Qed.
 
 (** Here are a couple of little theorems to prove about your
     definitions about bags above. *)
-
+Check bag. Check Set.
 (** **** Exercise: 1 star, standard (count_member_nonzero) *)
 Theorem count_member_nonzero : forall (s : bag),
   1 <=? (count 1 (1 :: s)) = true.
 Proof.
-  (* FILL IN HERE *) simpl. reflexivity. Qed. 
+intros s. simpl. reflexivity. Qed.
+
 (** [] *)
 
 (** The following lemma about [leb] might help you in the next
