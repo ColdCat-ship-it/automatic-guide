@@ -1064,21 +1064,30 @@ Fixpoint split {X Y : Type} (l : list (X*Y))
 Check combine.
 (** Prove that [split] and [combine] are inverses in the following
     sense: *)
-
 Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
   intros X Y l.
-  induction l as [| [x y] t IH]; intros l1 l2 H.
-  - inversion H. reflexivity.
-  - simpl in H.
-    destruct (split t) as [tx ty] eqn:Hs.
-    injection H as H1 H2.
-    subst l1 l2.
+  induction l.
+  - intros.
+    simpl in H.
+    injection H.
+    intros.
+    rewrite <- H0.
+    rewrite <- H1.
+    reflexivity.
+  - intros.
+    destruct x.
+    simpl in H.
+    destruct (split l).
+    injection H.
+    intros.
+    rewrite <- H0.
+    rewrite <- H1.
     simpl.
-    f_equal.
-    apply IH.
+    rewrite IHl.
+    reflexivity.
     reflexivity.
 Qed.
   (* FILL IN HERE *) (*unfold split. intros. destruct l. 
@@ -1154,13 +1163,22 @@ Proof.
 
           Search ( bool -> bool). 
 Check  identity_fn_applied_twice. 
+Check negation_fn_applied_twice.
 (** **** Exercise: 2 stars, standard (destruct_eqn_practice) *)
 Theorem bool_fn_applied_thrice :
   forall (f : bool -> bool) (b : bool),
   f (f (f b)) = f b.
 Proof.
-  (* FILL IN HERE *)intros. destruct (f b).
-  - Admitted.
+intros. destruct (f true). destruct (f false).    
+
+
+  (* intros. destruct (f b).
+    assert (f_f_t_t : forall (f : bool -> bool) (b : bool), (f (f b) = b)).
+{
+  intros.  
+}
+
+  - Admitted.FILL IN HERE *)
 (** [] *)
 
 (* ################################################################# *)
@@ -1274,7 +1292,14 @@ Theorem eqb_trans : forall n m p,
   n =? p = true.
 Proof.
   (* FILL IN HERE *) intros. apply eqb_true in H. apply eqb_true in H0. rewrite H0 in H. rewrite H. 
-  rewrite NatList.hp_eq_refl. reflexivity. Qed.
+  assert (hp_eq_refl_2 : forall k : nat, (k =? k) = true).
+{
+  intro k. induction k as [| k IH].
+  - reflexivity.
+  - simpl. exact IH.
+}
+rewrite hp_eq_refl_2. reflexivity.
+Qed.
 
 (** [] *)
 
