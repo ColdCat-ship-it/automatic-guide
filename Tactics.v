@@ -1355,7 +1355,6 @@ Proof.
       rewrite IHl1.
       reflexivity.
       exact H0.
-Qed.
 *)
 
 (* Do not modify the following line: *)
@@ -1368,8 +1367,21 @@ Theorem filter_exercise : forall (X : Type) (test : X -> bool)
   filter test l = x :: lf ->
   test x = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  intros X test x l.
+  induction l.
+  - intros lf H.
+    simpl in H.
+    discriminate H.
+  - intros lf H.
+    simpl in H.
+    destruct (test x0) eqn:Ht.
+    + injection H.
+      intros.
+      rewrite <- H1.
+      exact Ht.
+    + apply IHl in H.
+      exact H.
+Qed.
 
 (** **** Exercise: 4 stars, advanced, especially useful (forall_exists_challenge)
 
