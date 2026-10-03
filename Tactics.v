@@ -1314,14 +1314,49 @@ Qed.
     Your property will need to account for the behavior of [combine]
     in its base cases, which possibly drop some list elements. *)
 
-Definition split_combine_statement : Prop
-  (* ("[: Prop]" means that we are giving a name to a
-     logical proposition here.) *)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition split_combine_statement : Prop :=
+  forall (X Y : Type) (l1 : list X) (l2 : list Y),
+    length l1 = length l2 -> split (combine l1 l2) = (l1, l2).
 
 Theorem split_combine : split_combine_statement.
 Proof.
-(* FILL IN HERE *) Admitted.
+  unfold split_combine_statement.
+  intros X Y l1.
+  induction l1.
+  - intros l2 H.
+    destruct l2.
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - intros l2 H.
+    destruct l2.
+    + simpl in H. discriminate H.
+    + simpl in H.
+      injection H.
+      intros.
+      simpl.
+      rewrite IHl1.
+      reflexivity.
+      exact H0.
+Qed.
+(*
+Proof.
+  unfold split_combine_statement.
+  intros X Y l1 l2 H.
+  induction l1.
+  - destruct l2.
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - destruct l2.
+    + simpl in H. discriminate H.
+    + simpl in H.
+      injection H.
+      intros.
+      simpl.
+      rewrite IHl1.
+      reflexivity.
+      exact H0.
+Qed.
+*)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_split_combine : option (nat*string) := None.
