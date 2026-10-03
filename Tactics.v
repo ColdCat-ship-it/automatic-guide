@@ -1062,12 +1062,15 @@ Fixpoint split {X Y : Type} (l : list (X*Y))
 (** Prove that [split] and [combine] are inverses in the following
     sense: *)
 
+Search "split". 
+Search ((_,_)).
 Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  unfold combine. intros. destruct l.
-  -   Admitted.
+  intros X Y l. induction l.
+  - unfold split. intros. injection H. intros. rewrite <- H1. reflexivity.       
+  - destruct x. intros. specialize IHl with (l1 := x::l1). specialize IHl with (l2 := y ::l2).        Admitted.
   (* FILL IN HERE *) (*unfold split. intros. destruct l. 
   - destruct l1. reflexivity. discriminate.
                         - simpl. rewrite <- H.*) 
@@ -1146,8 +1149,9 @@ Theorem bool_fn_applied_thrice :
   forall (f : bool -> bool) (b : bool),
   f (f (f b)) = f b.
 Proof.
-  (* FILL IN HERE *)intros. destruct (f b).
-  - Admitted.
+  (* FILL IN HERE *)intros. revert f. destruct (b) eqn:fnew.  
+  - intro f. rewrite identity_fn_applied_twice. reflexivity. intro x.   
+  - rewrite negation_fn_applied_twice. reflexivity.  
 (** [] *)
 
 (* ################################################################# *)
@@ -1181,7 +1185,9 @@ Proof.
 
       - [simpl in H]: ... or a hypothesis
 
-      - [rewrite]: use an equality hypothesis (or lemma) to rewrite
+      - [rewrite]: use an equality hypothesis (or lemma) t
+  (* FILL IN HERE *) 
+o rewrite
         the goal
 
       - [rewrite ... in H]: ... or a hypothesis
@@ -1252,13 +1258,15 @@ Proof.
     [] *)
 
     Check trans_eq.
+    Check eqb_true. 
+    Search (_ =? _). 
 (** **** Exercise: 3 stars, standard, optional (eqb_trans) *)
 Theorem eqb_trans : forall n m p,
   n =? m = true ->
   m =? p = true -> 
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) intros. generalize dependent m. Admitted. 
+  (* FILL IN HERE *) intros. apply eqb_true in H. apply eqb_true in H0. rewrite H0 in H. rewrite H. rewrite eqb_refl. reflexivity. Qed.    
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine)
