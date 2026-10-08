@@ -852,16 +852,51 @@ Proof.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (leb_plus_exists) *)
-Theorem leb_plus_exists : forall n m, n <=? m = true -> exists x, m = n+x.
+Theorem leb_plus_exists : forall n m,
+  n <=? m = true -> exists x, m = n + x.
 Proof.
-(* FILL IN HERE *) intros. destruct n.
-  - exists m. reflexivity.  
-  - destruct m. + discriminate. + simpl in H. Admitted.        
+  intros n.
+  induction n as [| n IHn].
+  - intros m H.
+    exists m. reflexivity.
+  - intros m H.
+    destruct m as [| m].
+    + discriminate H.
+    + simpl in H.
+      apply IHn in H.
+      destruct H as [x H].
+      exists x.
+      simpl. rewrite H. reflexivity.
+Qed.
+(*
+  intros n m H.
+  destruct n as [| n].
+  - exists m. reflexivity.
+  - destruct m as [| m].
+    + discriminate H.
+    + simpl in H.
+      (* Stuck: H gives n <=? m = true,
+         but destruct did not provide an induction hypothesis
+         that produces the witness x. *)
+Admitted.
+*)
+(*
+intros. destruct H. destruct m. 
+  - Admitted.
+  *)
 
-Theorem plus_exists_leb : forall n m, (exists x, m = n+x) -> n <=? m = true.
+Theorem plus_exists_leb : forall n m,
+  (exists x, m = n + x) -> n <=? m = true.
 Proof.
-  (* FILL IN HERE *) intros. destruct H. destruct m. 
-  - Admitted.  
+  intros n.
+  induction n as [| n IHn].
+  - intros m H. reflexivity.
+  - intros m H.
+    destruct H as [x H].
+    rewrite H. simpl.
+    apply IHn.
+    exists x. reflexivity.
+Qed.
 
 (** [] *)
 
