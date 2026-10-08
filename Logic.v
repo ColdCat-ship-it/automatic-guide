@@ -1010,24 +1010,71 @@ Theorem In_map_iff :
   forall (A B : Type) (f : A -> B) (l : list A) (y : B),
          In y (map f l) <->
          exists x, f x = y /\ In x l.
-Proof.
+(* Proof.
   intros A B f l y. split.
   - induction l as [|x l' IHl'].
     + intros. destruct H. 
       (*  + intros. simpl in H. destruct H. *)   
-    + intros. exists x. simpl. split. destruct IHl'. simpl in H. destruct H. rewrite <- H. apply In_map. Admitted.         
+    + intros. exists x. simpl. split. destruct IHl'. simpl in H. destruct H. rewrite <- H. apply In_map. Admitted.
+*)
+
+Proof.
+  intros A B f l.
+  induction l as [| a l IH].
+  - intros y. simpl. split.
+    + intros H. destruct H.
+    + intros [x [Hf Hin]]. destruct Hin.
+  - intros y. simpl. split.
+    + intros [H | H].
+      * exists a. split.
+        -- exact H.
+        -- left. reflexivity.
+      * apply IH in H.
+        destruct H as [x [Hf Hin]].
+        exists x. split.
+        -- exact Hf.
+        -- right. exact Hin.
+    + intros [x [Hf Hin]].
+      destruct Hin as [Hx | Hin].
+      * left. rewrite Hx. exact Hf.
+      * right. apply IH.
+        exists x. split.
+        -- exact Hf.
+        -- exact Hin.
+Qed.         
     (* FILL IN HERE *) 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (In_app_iff) *)
 Theorem In_app_iff : forall A l l' (a:A),
   In a (l++l') <-> In a l \/ In a l'.
-Proof.
+(* Proof.
   intros A l. induction l as [|a' l' IH].
   (* FILL IN HERE *) intros. split.
   - intros. simpl in H. right. exact H.
   - intros. simpl. destruct H. exfalso. apply H. apply H.
-  - split. intros. simpl in H. destruct H. replace a' with a. simpl. left. left. reflexivity. Admitted.         
+  - split. intros. simpl in H. destruct H. replace a' with a. simpl. left. left. reflexivity. Admitted.
+*)
+Proof.
+  intros A l.
+  induction l as [| x l IH].
+  - intros l' a. simpl. split.
+    + intros H. right. exact H.
+    + intros [H | H].
+      * destruct H.
+      * exact H.
+  - intros l' a. simpl. split.
+    + intros [H | H].
+      * left. left. exact H.
+      * apply IH in H.
+        destruct H as [H | H].
+        -- left. right. exact H.
+        -- right. exact H.
+    + intros [[H | H] | H].
+      * left. exact H.
+      * right. apply IH. left. exact H.
+      * right. apply IH. right. exact H.
+Qed.         
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (All)
