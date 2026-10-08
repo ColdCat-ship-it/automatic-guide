@@ -1089,21 +1089,52 @@ Qed.
     lemma below.  (Of course, your definition should _not_ just
     restate the left-hand side of [All_In].) *)
 
+(* Previous definition:
 Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) 
   := match l with 
      | [] => True
      | x :: l' => P x \/ All P l'
+     end.
+*)
+
+Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) 
+  := match l with 
+     | [] => True
+     | x :: l' => P x /\ All P l'
      end. 
 
 Theorem All_In :
   forall T (P : T -> Prop) (l : list T),
     (forall x, In x l -> P x) <->
     All P l.
+(* Previous attempt:
 Proof.
   (* FILL IN HERE *) intros. split.
   - intros. destruct l. simpl. apply I. simpl. left. apply H. simpl. left. reflexivity.
-  - intros. Admitted.     
+  - intros. simpl. Admitted.
+*)
+
+Proof.
+  intros T P l.
+  induction l as [| a l IH].
+  - simpl. split.
+    + intros H. exact I.
+    + intros H x Hin. destruct Hin.
+  - destruct IH as [IHforward IHbackward].
+    simpl. split.
+    + intros H. split.
+      * apply H. left. reflexivity.
+      * apply IHforward.
+        intros x Hin. apply H. right. exact Hin.
+    + intros [Ha Hl] x Hin.
+      destruct Hin as [Heq | Hin].
+      * rewrite <- Heq. exact Ha.
+      * apply IHbackward.
+        -- exact Hl.
+        -- exact Hin.
+Qed.     
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (combine_odd_even)
