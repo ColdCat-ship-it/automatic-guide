@@ -334,14 +334,17 @@ Lemma mult_is_O :
 Proof.
   (* FILL IN HERE *) intros. destruct n.
   - left. reflexivity.   
-  - destruct m. right. reflexivity. Admitted.      
+  - destruct m. right. reflexivity. discriminate. Qed.     
 (** [] *)
+Print True.
 
+Print False. 
 (** **** Exercise: 1 star, standard (or_commut) *)
 Theorem or_commut : forall P Q : Prop,
   P \/ Q  -> Q \/ P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros P Q [HP | HQ].
+      right. exact HP. left. exact HQ.   Qed. 
 (** [] *)
 
 (* ================================================================= *)
@@ -371,7 +374,8 @@ Definition not (P:Prop) := P -> False.
 Check not : Prop -> Prop.
 
 Notation "~ x" := (not x) : type_scope.
-
+Print False.
+Check False_ind. 
 End NotPlayground.
 
 (** Since [False] is a contradictory proposition, the principle of
@@ -383,6 +387,9 @@ Theorem ex_falso_quodlibet : forall (P:Prop),
 Proof.
   intros P contra.
   destruct contra.  Qed.
+
+
+(** exflaso. // the tactic that equiv to above.  *)
 
 (** The Latin _ex falso quodlibet_ means, literally, "from falsehood
     follows whatever you like"; this is another common name for the
@@ -399,7 +406,8 @@ Proof.
 Theorem not_implies_our_not : forall (P:Prop),
   ~ P -> (forall (Q:Prop), P -> Q).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. 
+  destruct H. exact H0. Qed. 
 (** [] *)
 
 (** Inequality is a very common form of negated statement, so there is a
@@ -425,6 +433,11 @@ Proof.
       of it. *)
   discriminate contra.
 Qed.
+
+Theorem not_true_is_false_play : forall b : bool, b <> true -> b = false.
+Proof. 
+  intros b H. destruct b; auto. 
+  - unfold not in H. exfalso. apply H. reflexivity. Qed.   
 
 (** It takes a little practice to get used to working with negation in Rocq.
     Even though _you_ may see perfectly well why a claim involving
@@ -461,20 +474,21 @@ Proof.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_double_neg_informal : option (nat*string) := None.
-(** [] *)
+(** True is a type, and false is inductively constructed[] *)
 
 (** **** Exercise: 1 star, standard, especially useful (contrapositive) *)
 Theorem contrapositive : forall (P Q : Prop),
   (P -> Q) -> (~Q -> ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros P Q H. unfold not. intros H0 HP. apply H0. apply H.          exact HP. Qed.   
 (** [] *)
 
 (** **** Exercise: 1 star, standard (not_both_true_and_false) *)
 Theorem not_both_true_and_false : forall P : Prop,
   ~ (P /\ ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) unfold not. 
+  intros. destruct H. apply H0. exact H. Qed.   
 (** [] *)
 
 (** **** Exercise: 1 star, advanced (not_PNP_informal)
@@ -482,7 +496,8 @@ Proof.
     Write an informal proof (in English) of the proposition [forall P
     : Prop, ~(P /\ ~P)]. *)
 
-(* FILL IN HERE *)
+(* Case 1: P is true. Then not P is false, P and ~P is false, not false is true.
+    Case 2: P is false. Then P is false, similarly, not false is true. *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_not_PNP_informal : option (nat*string) := None.
@@ -499,8 +514,10 @@ Definition manual_grade_for_not_PNP_informal : option (nat*string) := None.
 Theorem de_morgan_not_or : forall (P Q : Prop),
     ~ (P \/ Q) -> ~P /\ ~Q.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *)unfold not.  intros. split. 
+  - intros. apply H. left. exact H0.
+  - intros. apply H. right. exact H0. Qed. 
+    (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (not_S_inverse_pred)
 
@@ -508,7 +525,7 @@ Proof.
     [S] and [pred] are inverses of each other: *)
 Lemma not_S_pred_n : ~(forall n : nat, S (pred n) = n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) unfold not. intros. specialize H with (n := 0). discriminate. Qed.    
 (** [] *)
 
 (** Since inequality involves a negation, it also requires a little
@@ -555,7 +572,9 @@ Qed.
     the successor function is the inverse of predecessor. *)
 Lemma S_pred_not_zero : forall n, n<>0 -> S (pred n) = n.
 Proof.
-   (* FILL IN HERE *) Admitted.
+   (* FILL IN HERE *) intros. unfold not in H. destruct n.
+   - exfalso. apply H. reflexivity.     
+   - reflexivity. Qed. 
 (** [] *)
 
 (* ================================================================= *)
@@ -614,7 +633,7 @@ Qed.
 
 Theorem nil_is_not_cons : forall X (x : X) (xs : list X), ~ (nil = x :: xs).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. unfold not. intros. discriminate. Qed.  
 (** [] *)
 
 (* ================================================================= *)
@@ -676,20 +695,27 @@ Qed.
 Theorem iff_refl : forall P : Prop,
   P <-> P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) split; intros; exact H. Qed.  
 
 Theorem iff_trans : forall P Q R : Prop,
   (P <-> Q) -> (Q <-> R) -> (P <-> R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. split.  
+  - destruct H0. intros. apply H0. apply H. exact H2.
+  - destruct H. intros. apply H1. apply H0. exact H2. Qed.  
 (** [] *)
 
+    Search (_ /\ _). 
 (** **** Exercise: 3 stars, standard (or_distributes_over_and) *)
 Theorem or_distributes_over_and : forall P Q R : Prop,
   P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  (* FILL IN HERE *) intros. split.
+  - split. destruct H.
+    + left. exact H. + destruct H. right. exact H. + destruct H. left. exact H. destruct H. right. exact H0.
+  - intros. destruct H. destruct H. destruct H0. 
+    + left. apply H. + left. apply H. + destruct H0. left. apply H0. right. apply conj. exact H. exact H0. Qed.    
+(** [] *) 
 
 (* ================================================================= *)
 (** ** Setoids and Logical Equivalence *)
@@ -753,6 +779,14 @@ Proof.
   reflexivity.
 Qed.
 
+Print mul_eq_0_ternary. 
+
+Lemma mul_eq_0_ternary_play :
+  forall n m p, n * m * p = 0 <-> n = 0 \/ m = 0 \/ p = 0.
+Proof.
+  intros n m p. Admitted. 
+
+  Print mul_eq_0_ternary_play. 
 (* ================================================================= *)
 (** ** Existential Quantification *)
 
@@ -777,6 +811,7 @@ Proof.
   unfold Even. exists 2. reflexivity.
 Qed.
 
+Print ex. 
 (** Conversely, if we have an existential hypothesis [exists x, P] in
     the context, we can destruct it to obtain a witness [x] and a
     hypothesis stating that [P] holds of [x]. *)
@@ -799,7 +834,8 @@ Proof.
 Theorem dist_not_exists : forall (X:Type) (P : X -> Prop),
   (forall x, P x) -> ~ (exists x, ~ P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  unfold not. intros. destruct H0. exfalso. apply H0. apply H. Qed.            
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (dist_exists_or)
@@ -810,17 +846,22 @@ Proof.
 Theorem dist_exists_or : forall (X:Type) (P Q : X -> Prop),
   (exists x, P x \/ Q x) <-> (exists x, P x) \/ (exists x, Q x).
 Proof.
-   (* FILL IN HERE *) Admitted.
+   (* FILL IN HERE *) intros. split.
+   - intros. destruct H. destruct H. left. exists x. exact H. right. exists x. exact H.
+   - intros. destruct H. destruct H. exists x. left. exact H. destruct H. exists x. right. exact H. Qed.        
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (leb_plus_exists) *)
 Theorem leb_plus_exists : forall n m, n <=? m = true -> exists x, m = n+x.
 Proof.
-(* FILL IN HERE *) Admitted.
+(* FILL IN HERE *) intros. destruct n.
+  - exists m. reflexivity.  
+  - destruct m. + discriminate. + simpl in H. Admitted.        
 
 Theorem plus_exists_leb : forall n m, (exists x, m = n+x) -> n <=? m = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. destruct H. destruct m. 
+  - Admitted.  
 
 (** [] *)
 
@@ -937,6 +978,8 @@ Theorem In_map_iff :
 Proof.
   intros A B f l y. split.
   - induction l as [|x l' IHl'].
+    + intros. destruct H. 
+    + intros. exists x. simpl. split.       
     (* FILL IN HERE *) Admitted.
 (** [] *)
 
