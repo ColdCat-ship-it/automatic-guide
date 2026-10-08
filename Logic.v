@@ -1561,9 +1561,14 @@ Theorem orb_true_iff : forall b1 b2,
   b1 || b2 = true <-> b1 = true \/ b2 = true.
 Proof.
   (* FILL IN HERE *) intros. split. 
-  - intros.   
+  - intros. rewrite <-  H. destruct b1. left.  reflexivity. rewrite H. right. destruct b2. reflexivity. discriminate. 
+  - intros. destruct H. rewrite H. reflexivity. rewrite H. destruct b1; reflexivity. Qed.  
 (** [] *)
 
+Search (_=?_).
+Search (_=?_ = true). 
+Search (_=_ -> true). 
+Check not_true_iff_false. 
 (** **** Exercise: 1 star, standard (eqb_neq)
 
     The following theorem is an alternate "negative" formulation of
@@ -1573,7 +1578,10 @@ Proof.
 Theorem eqb_neq : forall x y : nat,
   x =? y = false <-> x <> y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. rewrite <- (not_true_iff_false (x=?y)). rewrite eqb_eq. reflexivity. Qed.    
+  (**(* FILL IN HERE *) intros.  destruct (x =? y) eqn:H.  
+  - split. intros. discriminate. unfold not. intros. apply eqb_true in H. exfalso. apply H0. exact H. 
+     - split. intros. unfold not.  *)  
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (eqb_list)
@@ -1586,14 +1594,25 @@ Proof.
 
 Fixpoint eqb_list {A : Type} (eqb : A -> A -> bool)
                   (l1 l2 : list A) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+    :=  match l1, l2 with 
+     | [], [] => true
+     | _, [] => false
+     | [], _ => false
+     | x :: l1', y :: l2' => if (eqb x y)  then eqb_list eqb l1' l2' else false
+     end. 
 
 Theorem eqb_list_true_iff :
   forall A (eqb : A -> A -> bool),
     (forall a1 a2, eqb a1 a2 = true <-> a1 = a2) ->
     forall l1 l2, eqb_list eqb l1 l2 = true <-> l1 = l2.
 Proof.
-(* FILL IN HERE *) Admitted.
+(* FILL IN HERE *) intros. generalize dependent l2. induction l1.
+  - split; destruct l2.  reflexivity. discriminate. reflexivity. discriminate.     
+    (**- split; intros; discriminate.   
+       - split; intros; discriminate. *)
+  - split. destruct l2. discriminate. simpl. destruct (eqb x x0) eqn:Ex. intros. apply H in Ex. rewrite Ex. apply IHl1 in H0. rewrite H0. reflexivity. discriminate. 
+    + intros. rewrite <- H0. simpl. assert (eqb x x = true). apply H. reflexivity. rewrite H1. apply IHl1. reflexivity.   Qed.
 
 (** [] *)
 
@@ -1606,12 +1625,18 @@ Proof.
 (** Copy the definition of [forallb] from your [Tactics] here
     so that this file can be graded on its own. *)
 Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := match l with 
+     | [] => true
+     | a :: l' => if test a then forallb test l' else false
+     end. 
 
 Theorem forallb_true_iff : forall X test (l : list X),
   forallb test l = true <-> All (fun x => test x = true) l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros . induction l.  
+  - split; intros; try exact I; try reflexivity. 
+  - simpl. fold (andb (test x) (forallb test l)). rewrite andb_true_iff. rewrite IHl.   
 
 (** (Ungraded thought question) Are there any important properties of
     the function [forallb] which are not captured by this
