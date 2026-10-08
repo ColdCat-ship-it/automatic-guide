@@ -979,8 +979,9 @@ Proof.
   intros A B f l y. split.
   - induction l as [|x l' IHl'].
     + intros. destruct H. 
-    + intros. exists x. simpl. split.       
-    (* FILL IN HERE *) Admitted.
+      (*  + intros. simpl in H. destruct H. *)   
+    + intros. exists x. simpl. split. destruct IHl'. simpl in H. destruct H. rewrite <- H. apply In_map. Admitted.         
+    (* FILL IN HERE *) 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (In_app_iff) *)
@@ -988,7 +989,10 @@ Theorem In_app_iff : forall A l l' (a:A),
   In a (l++l') <-> In a l \/ In a l'.
 Proof.
   intros A l. induction l as [|a' l' IH].
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. split.
+  - intros. simpl in H. right. exact H.
+  - intros. simpl. destruct H. exfalso. apply H. apply H.
+  - split. intros. simpl in H. destruct H. replace a' with a. simpl. left. left. reflexivity. Admitted.         
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (All)
@@ -1004,14 +1008,20 @@ Proof.
     restate the left-hand side of [All_In].) *)
 
 Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) 
+  := match l with 
+     | [] => True
+     | x :: l' => P x \/ All P l'
+     end. 
 
 Theorem All_In :
   forall T (P : T -> Prop) (l : list T),
     (forall x, In x l -> P x) <->
     All P l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. split.
+  - intros. destruct l. simpl. apply I. simpl. left. apply H. simpl. left. reflexivity.
+  - intros. Admitted.     
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (combine_odd_even)
