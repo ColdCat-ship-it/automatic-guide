@@ -1500,6 +1500,8 @@ Proof.
   reflexivity.
 Qed.
 
+Search (_&&_). 
+
 (** We won't discuss reflection any further for the moment, but
     it serves as a good example showing the different strengths of
     booleans and general propositions. *)
@@ -1515,12 +1517,16 @@ Qed.
 Theorem andb_true_iff : forall b1 b2:bool,
   b1 && b2 = true <-> b1 = true /\ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. split. 
+  - intros. assert (h' := H). apply andb_true_elim2 in H. rewrite andb_commutative in h'. apply andb_true_elim2 in h'. rewrite H. rewrite h'. split; reflexivity.
+  - intros. destruct H. rewrite H0. rewrite H. reflexivity. Qed.         
 
+Search (_ || _). 
 Theorem orb_true_iff : forall b1 b2,
   b1 || b2 = true <-> b1 = true \/ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. split. 
+  - intros.   
 (** [] *)
 
 (** **** Exercise: 1 star, standard (eqb_neq)
