@@ -568,7 +568,11 @@ Qed.
 Theorem ev_double : forall n,
   ev (double n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  induction n.
+  - unfold double. Print ev. exact ev_0.
+  - simpl. apply ev_SS. exact IHn. Qed.       
+
 (** [] *)
 
 (* ================================================================= *)
@@ -834,6 +838,8 @@ Proof.
     So we are stuck! *)
 Abort.
 
+(** There is tactic of subst. which do a bunch of rewrite *) :
+
 (* ================================================================= *)
 (** ** Induction on Evidence *)
 
@@ -858,6 +864,7 @@ Abort.
     evidence for [ev n']. In this case, the inductive hypothesis says
     that the property we are trying to prove holds for [n']. *)
 
+(* Check ev_ind. *)
 (** Let's try proving that lemma again: *)
 
 Lemma ev_Even : forall n,
