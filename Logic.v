@@ -1451,7 +1451,9 @@ Lemma even_double_conv : forall n, exists k,
   n = if even n then double k else S (double k).
 Proof.
   (* Hint: Use the [even_S] lemma from [Induction.v]. *)
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. induction n. 
+  - exists 0. auto.
+  - destruct IHn. rewrite even_S. Admitted.   
 (** [] *)
 
 (** Now the main theorem: *)
@@ -1714,7 +1716,7 @@ Theorem forallb_true_iff : forall X test (l : list X),
 Proof.
   (* FILL IN HERE *) intros . induction l.  
   - split; intros; try exact I; try reflexivity. 
-  - simpl. fold (andb (test x) (forallb test l)). rewrite andb_true_iff. rewrite IHl.   
+  - simpl. fold (andb (test x) (forallb test l)). rewrite andb_true_iff. rewrite IHl.  reflexivity. Qed.   
 
 (** (Ungraded thought question) Are there any important properties of
     the function [forallb] which are not captured by this
@@ -1851,6 +1853,13 @@ Fixpoint rev_append {X} (l1 l2 : list X) : list X :=
 Definition tr_rev {X} (l : list X) : list X :=
   rev_append l [].
 
+Theorem rev_append_correct : forall X (l1 l2 : list X),
+  rev_append l1 l2 = rev l1 ++ l2. 
+Proof.
+  intros. revert l2. induction l1. 
+  - intros l2. reflexivity.  
+  - intros l2. simpl. rewrite IHl1. rewrite <- app_assoc. reflexivity. Qed.     
+
 (** This version of [rev] is said to be _tail recursive_, because the
     recursive call to the function is the last operation that needs to be
     performed (i.e., we don't have to execute [++] after the recursive
@@ -1861,7 +1870,7 @@ Definition tr_rev {X} (l : list X) : list X :=
 
 Theorem tr_rev_correct : forall X, @tr_rev X = @rev X.
 Proof.
-(* FILL IN HERE *) Admitted.
+(* FILL IN HERE *) intros. apply functional_extensionality. intros. unfold tr_rev. rewrite rev_append_correct. apply app_nil_r. Qed.      
 (** [] *)
 
 (* ================================================================= *)
@@ -1990,7 +1999,10 @@ Qed.
 Theorem excluded_middle_irrefutable: forall (P : Prop),
   ~ ~ (P \/ ~ P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros a b.   
+  apply b. right. intro H. apply b.
+  left. exact H. Qed. 
+  (* FILL IN HERE *) 
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (not_exists_dist)
@@ -2011,8 +2023,13 @@ Theorem not_exists_dist :
   forall (X:Type) (P : X -> Prop),
     ~ (exists x, ~ P x) -> (forall x, P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  destruct (H (P x)) as [HP | HNP]. 
+  - exact HP. 
+  - exfalso. apply H0. exists x. exact HNP. Qed.       
+
 (** [] *)
+
 
 (** **** Exercise: 5 stars, standard, optional (classical_axioms)
 

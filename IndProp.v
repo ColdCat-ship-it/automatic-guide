@@ -838,7 +838,7 @@ Proof.
     So we are stuck! *)
 Abort.
 
-(** There is tactic of subst. which do a bunch of rewrite *) :
+(** There is tactic of subst. which do a bunch of rewrite *) 
 
 (* ================================================================= *)
 (** ** Induction on Evidence *)
@@ -864,7 +864,7 @@ Abort.
     evidence for [ev n']. In this case, the inductive hypothesis says
     that the property we are trying to prove holds for [n']. *)
 
-(* Check ev_ind. *)
+Check ev_ind. 
 (** Let's try proving that lemma again: *)
 
 Lemma ev_Even : forall n,
@@ -878,6 +878,12 @@ Proof.
     simpl. f_equal. f_equal. apply IH.
 Qed.
 
+Lemma ev_Even_try : forall n,
+  ev n -> Even n.
+Proof. 
+  unfold Even. intros. induction H.
+  - exists 0. reflexivity.
+  - exists (div2 n). simpl. f_equal. Admitted.   
 (** Here, we can see that Rocq produced an [IH] that corresponds
     to [E'], the single recursive occurrence of [ev] in its own
     definition.  Since [E'] mentions [n'], the induction hypothesis
