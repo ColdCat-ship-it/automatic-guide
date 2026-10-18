@@ -610,15 +610,21 @@ Qed.
     built using the constructors of data types such as nat, list,
     binary trees, etc. *)
 
+Print perm3_trans. 
 (** **** Exercise: 1 star, standard (Perm3) *)
 Lemma Perm3_ex1 : Perm3 [1;2;3] [2;3;1].
 Proof.
-  (* FILL IN HERE *) Admitted.
+  apply (perm3_trans _ [2;1;3] _ 
+          (perm3_swap12 _ _ _)
+          (perm3_swap23 _ _ _) ). Qed. 
 
 Lemma Perm3_refl : forall (X : Type) (a b c : X),
   Perm3 [a;b;c] [a;b;c].
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+  intros. apply (perm3_trans _ [b;a;c] _
+            (perm3_swap12 _ _ _ )
+            (perm3_swap12 _ _ _ ) ). Qed. 
 (** [] *)
 
 (* ################################################################# *)
@@ -682,11 +688,16 @@ Qed.
 (** **** Exercise: 1 star, standard (le_inversion)
 
     Let's prove a similar inversion lemma for [le]. *)
+Search ( _ /\ _). 
+
 Lemma le_inversion : forall (n m : nat),
   le n m ->
   (n = m) \/ (exists m', m = S m' /\ le n m').
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. destruct H.  
+  - left. reflexivity.  
+  - right. intros. exists m. apply conj. reflexivity. exact H.
+Qed. 
 (** [] *)
 
 (** We can use the inversion lemma that we proved above to help
@@ -747,7 +758,7 @@ Proof. intros H. inversion H. Qed.
 Theorem SSSSev__even : forall n,
   ev (S (S (S (S n)))) -> ev n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. inversion H. inversion H1. exact H3. Qed.    
 (** [] *)
 
 (** **** Exercise: 1 star, standard (ev5_nonsense)
@@ -757,7 +768,7 @@ Proof.
 Theorem ev5_nonsense :
   ev 5 -> 2 + 2 = 9.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. inversion H. inversion H1. inversion H3. Qed.    
 (** [] *)
 
 (** The [inversion] tactic does quite a bit of work. For
@@ -907,11 +918,22 @@ Qed.
 (** The following exercises provide simpler examples of this
     technique, to help you familiarize yourself with it. *)
 
+Print ev.
+Search Even. 
+Print Even. 
+Search ev.
+           
 (** **** Exercise: 2 stars, standard (ev_sum) *)
 Theorem ev_sum : forall n m, ev n -> ev m -> ev (n + m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. induction H, H0; try simpl; try apply ev_0; 
+  try simpl; try apply ev_SS; try exact H0; try exact IHev.
+Qed. 
 (** [] *)
+
+Search ( _/\_). 
+
+(* Theorem ev_helper : forall n m, ev(n+m) /\ ev n -> ev m. *)
 
 (** **** Exercise: 3 stars, advanced, especially useful (ev_ev__ev) *)
 Theorem ev_ev__ev : forall n m,
@@ -919,7 +941,9 @@ Theorem ev_ev__ev : forall n m,
   (* Hint: There are two pieces of evidence you could attempt to induct upon
       here. If one doesn't work, try the other. *)
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. induction H0.
+  - exact H.      
+  - inversion H. apply IHev. exact H2. Qed.   
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (ev_plus_plus)
@@ -931,7 +955,7 @@ Proof.
 Theorem ev_plus_plus : forall n m p,
   ev (n+m) -> ev (n+p) -> ev (m+p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) Admitted. 
 (** [] *)
 
 (* ================================================================= *)
@@ -1031,11 +1055,26 @@ Proof.
     * apply IH12.
 Qed.
 
+Print In.
+Search In. 
 (** **** Exercise: 2 stars, standard (Perm3_In) *)
 Lemma Perm3_In : forall (X : Type) (x : X) (l1 l2 : list X),
     Perm3 l1 l2 -> In x l1 -> In x l2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL INHERE *) intros. (* destruct H; simpl in *; subst; intuition.   *)
+  induction H.  
+  - intros. destruct H0. 
+    + right. left. exact H.     
+    + destruct H. 
+      * left. exact H.   
+      * right. right. exact H.   
+  - intros. destruct H0.  
+    + left. exact H.  
+    + destruct H.  
+      * right. right. simpl. left.  exact H.   
+      * right. left. simpl in H. destruct H. exact H. destruct H.
+  - apply IHPerm3_2. apply IHPerm3_1. exact H0. 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (Perm3_NotIn) *)
