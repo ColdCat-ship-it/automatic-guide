@@ -172,10 +172,15 @@ Print ev_4'''.
 
 Theorem ev_8 : ev 8.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  apply ev_SS.
+  apply ev_SS.
+  apply ev_SS.
+  apply ev_SS.
+  apply ev_0.
+Qed.
 
-Definition ev_8' : ev 8
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ev_8' : ev 8 :=
+  ev_SS 6 (ev_SS 4 (ev_SS 2 (ev_SS 0 ev_0))).
 (** [] *)
 
 (* ################################################################# *)
@@ -396,8 +401,14 @@ Definition and_comm' P Q : P /\ Q <-> Q /\ P :=
 
     Construct a proof object for the following proposition. *)
 
-Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
+  fun P Q R HPQ HQR =>
+    match HPQ with
+    | conj HP HQ =>
+        match HQR with
+        | conj HQ' HR => conj HP HR
+        end
+    end.
 (** [] *)
 
 (* ================================================================= *)
@@ -454,8 +465,12 @@ End Or.
 
     Construct a proof object for the following proposition. *)
 
-Definition or_commut' : forall P Q, P \/ Q -> Q \/ P
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition or_commut' : forall P Q, P \/ Q -> Q \/ P :=
+  fun P Q H =>
+    match H with
+    | or_introl HP => or_intror HP
+    | or_intror HQ => or_introl HQ
+    end.
 (** [] *)
 
 (* ================================================================= *)
@@ -500,8 +515,8 @@ Definition some_nat_is_even : exists n, ev n :=
 
     Construct a proof object for the following proposition. *)
 
-Definition ex_ev_Sn : ex (fun n => ev (S n))
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ex_ev_Sn : ex (fun n => ev (S n)) :=
+  ex_intro (fun n => ev (S n)) 1 (ev_SS 0 ev_0).
 (** [] *)
 
 (** To destruct existentials in a proof term we simply use match: *)
@@ -520,8 +535,11 @@ Definition dist_exists_or_term (X:Type) (P Q : X -> Prop) :
     Construct a proof object for the following proposition: *)
 Definition ex_match : forall (A : Type) (P Q : A -> Prop),
   (forall x, P x -> Q x) ->
-  (exists x, P x) -> (exists x, Q x)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (exists x, P x) -> (exists x, Q x) :=
+  fun A P Q HPQ H =>
+    match H with
+    | ex_intro _ x HPx => ex_intro Q x (HPQ x HPx)
+    end.
 (** [] *)
 
 (* ================================================================= *)
