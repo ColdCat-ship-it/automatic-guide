@@ -718,9 +718,14 @@ Qed.
 
 Definition eq_cons : forall (X : Type) (h1 h2 : X) (t1 t2 : list X),
     h1 == h2 -> t1 == t2 -> h1 :: t1 == h2 :: t2
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+    (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+    fun (X: Type) (h1 h2: X) (t1 t2: list X) Heq Teq =>
+      match Heq, Teq with
+      | eq_refl h, eq_refl t => eq_refl (h :: t) 
+      end. 
 (** [] *)
 
+Check eq_cons. 
 Print eq_ind. 
 (** **** Exercise: 2 stars, standard (equality__leibniz_equality)
 
@@ -732,7 +737,11 @@ Print eq_ind.
 Lemma equality__leibniz_equality : forall (X : Type) (x y: X),
   x == y -> forall (P : X -> Prop), P x -> P y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+  intros. 
+  destruct H.
+  exact H0.
+Qed. 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (equality__leibniz_equality_term)
@@ -743,8 +752,14 @@ Proof.
     needessly complicated. Hint: pattern-match as soon as possible. *)
 Definition equality__leibniz_equality_term : forall (X : Type) (x y: X),
     x == y -> forall P : (X -> Prop), P x -> P y
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+    := fun (X: Type) (x y: X) Heq =>
+    match Heq with
+    | eq_refl h => fun (P : X -> Prop) HP => HP
+    end. 
 (** [] *)
+
+Check equality__leibniz_equality_term. 
 
 (** **** Exercise: 3 stars, standard, optional (leibniz_equality__equality)
 
@@ -756,7 +771,10 @@ Definition equality__leibniz_equality_term : forall (X : Type) (x y: X),
 Lemma leibniz_equality__equality : forall (X : Type) (x y: X),
   (forall P:X->Prop, P x -> P y) -> x == y.
 Proof.
-(* FILL IN HERE *) Admitted.
+(* FILL IN HERE *) intros.
+  specialize H with (fun n : X => eq x n). 
+  (* simpl in H.  *)
+  apply H. apply eq_refl.  Qed.   
 (** [] *)
 
 End EqualityPlayground.
