@@ -356,12 +356,28 @@ Print prod.
     allows us to consider all possible ways in which [P /\ Q] was
     proved -- here just one (the [conj] constructor). *)
 
+Check nat_rec.
+Check Set. 
+Check Prop. 
+Check Type. 
+
 Theorem proj1' : forall P Q,
   P /\ Q -> P.
 Proof.
   intros P Q HPQ. destruct HPQ as [HP HQ]. apply HP.
   Show Proof.
 Qed.
+
+Print and.  
+
+Theorem proj''' P Q (HPQ: P /\ Q) : P.
+Proof. 
+  refine (
+  match HPQ with 
+  | conj HP HQ => _
+  end).
+  apply HP. 
+Qed. 
 
 (** Similarly, the [split] tactic actually works for any inductively
     defined proposition with exactly one constructor.  In particular,
@@ -409,6 +425,8 @@ Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
         | conj HQ' HR => conj HP HR
         end
     end.
+
+Check and_ind. 
 (** [] *)
 
 (* ================================================================= *)
@@ -519,6 +537,7 @@ Definition ex_ev_Sn : ex (fun n => ev (S n)) :=
   ex_intro (fun n => ev (S n)) 1 (ev_SS 0 ev_0).
 (** [] *)
 
+Print ex_intro. 
 (** To destruct existentials in a proof term we simply use match: *)
 Definition dist_exists_or_term (X:Type) (P Q : X -> Prop) :
   (exists x, P x \/ Q x) -> (exists x, P x) \/ (exists x, Q x) :=
@@ -653,6 +672,14 @@ Qed.
 Definition four' : 2 + 2 == 1 + 3 :=
   eq_refl 4.
 
+Lemma revisited: 
+    forall (n m : nat), S n + m = n + S m.
+Proof. 
+  intros. 
+  cbv delta.
+  cbv iota.
+  cbv beta. 
+  Admitted.  
 Definition singleton : forall (X:Type) (x:X), []++[x] == x::[]  :=
   fun (X:Type) (x:X) => eq_refl [x].
 
@@ -694,6 +721,7 @@ Definition eq_cons : forall (X : Type) (h1 h2 : X) (t1 t2 : list X),
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 (** [] *)
 
+Print eq_ind. 
 (** **** Exercise: 2 stars, standard (equality__leibniz_equality)
 
     The inductive definition of equality implies _Leibniz equality_:
