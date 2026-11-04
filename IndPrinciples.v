@@ -20,12 +20,22 @@ Check nat_ind :
     (forall n : nat, P n -> P (S n)) ->
     forall n : nat, P n.
 
+Check nat_ind.
+Check list_ind.
+Check bool_ind.
+Check eq_ind.
+Check or_ind.
+Check False_ind. 
+Check and_ind. 
+
 (** In English: Suppose [P] is a property of natural numbers (that is,
       [P n] is a [Prop] for every [n]). To show that [P n] holds of all
       [n], it suffices to show:
 
       - [P] holds of [0]
-      - for any [n], if [P] holds of [n], then [P] holds of [S n]. *)
+      - for any [n], if [P] holds of [n], then [P] holds of [S n]. 
+
+   inductive motive is the word we are looking for *) 
 
 (** The [induction] tactic is a straightforward wrapper that, at its
     core, simply performs [apply t_ind].  To see this more clearly,
@@ -71,7 +81,10 @@ Proof.
 Theorem plus_one_r' : forall n:nat,
   n + 1 = S n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *)  
+  apply nat_ind.
+  - reflexivity. 
+  - intros. rewrite <- H.   
 (** [] *)
 
 (** Rocq generates induction principles for every datatype
@@ -189,6 +202,7 @@ Inductive booltree : Type :=
 
 Definition booltree_property_type : Type := booltree -> Prop.
 
+Admitted. 
 Definition base_case (P : booltree_property_type) : Prop
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
@@ -488,6 +502,13 @@ Proof.
     from [IndProp]: *)
 
 Print ev.
+Inductive odd : nat -> Prop :=
+  | odd_1 : odd 1
+  | odd_SS : forall (n : nat), 
+        odd n -> odd (S (S n)).
+
+Check odd.
+Check odd_ind. 
 
 (* ===>
 
@@ -542,6 +563,14 @@ Inductive le1 : nat -> nat -> Prop :=
   | le1_n : forall n, le1 n n
   | le1_S : forall n m, (le1 n m) -> (le1 n (S m)).
 
+(** Seems like nat -> Prop don't have rect? 
+  and if we define using nat -> Type, then we have some 
+   xxx_rect. *)
+Check odd_ind. 
+Fail Check odd_rect. 
+
+Check le1_ind. 
+
 Notation "m <=1 n" := (le1 m n) (at level 70).
 
 (** This definition can be streamlined a little by observing that the
@@ -569,6 +598,23 @@ Check le2_ind :
     P n ->
     (forall m : nat, n <=2 m -> P m -> P (S m)) ->
     forall n0 : nat, n <=2 n0 -> P n0.
+
+Check le_ind. 
+
+Definition nat_ind2:
+  forall (P : nat -> Prop),
+  P 0 -> P 1 -> (forall n : nat, P n -> P (S(S n))) -> forall n : nat, P n.
+Proof. 
+  refine ( fun P P0 P1 PSS => _ ). 
+  refine ( fix f(n : nat) := match n with
+                             | 0 => _
+                             | 1 => _
+                             | S (S m) => _
+                             end). 
+  - exact P0.
+  - exact P1.
+  - apply PSS. apply f. 
+Defined.
 
 (* ################################################################# *)
 (** * Another Form of Induction Principles on Propositions (Optional) *)
@@ -874,7 +920,20 @@ Abort.
     non-standard induction principle that goes "by twos":
  *)
 
-Definition nat_ind2 :
+(** i
+    so, use nat ind to define nat ind 2.
+    Check well founded ind 
+   ifor n nat. m < n, P m -> P n  -> for all n, P n
+
+   induction over n on that
+ *)
+
+Check well_founded_ind. 
+
+ (** induction over prop since we can keep the motives simpliar *)
+
+
+Definition nat_ind2' :
   forall (P : nat -> Prop),
   P 0 ->
   P 1 ->
@@ -978,3 +1037,30 @@ Proof. (* FILL IN HERE *) Admitted.
 
 
 (* 2026-08-24 10:03 *)
+
+(* So the beautiful part should be the x_SS inductive definition. *)
+Lemma ev_odd : forall (n : nat), 
+  ev n -> odd (S n).
+Proof. 
+  intros. induction H. 
+  - constructor. 
+  - apply odd_SS. 
+    auto. Qed. 
+  
+Lemma odd_ev : forall (n : nat), 
+  odd n -> ev (S n).
+Proof. 
+  intros. induction H.
+  - constructor. apply ev_0. 
+  - apply ev_SS. auto.
+Qed. 
+
+Lemma even_or_odd: 
+  forall (n : nat), ev n \/ odd n.
+Proof. 
+  intros. induction n.
+  - constructor. apply ev_0.  
+  - destruct IHn.
+    + right. apply ev_odd. exact H.  
+    + left. apply odd_ev. exact H. 
+  Qed. 

@@ -910,37 +910,82 @@ Fail Definition falso : False := infinite_loop 0.
 (** **** Exercise: 2 stars, standard (and_assoc) *)
 Definition and_assoc : forall P Q R : Prop,
     P /\ (Q /\ R) -> (P /\ Q) /\ R
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *):=
+  fun P Q R H => 
+  match H with 
+  | conj P (conj Q R) => conj (conj P Q) R
+  end. 
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (or_distributes_over_and) *)
 Definition or_distributes_over_and : forall P Q R : Prop,
     P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
-(** [] *)
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+    fun P Q R  =>
+    conj (fun LHS => match LHS with
+                     | or_introl P => conj (or_introl P) (or_introl P)
+                     | or_intror (conj Q R) => conj (or_intror Q) (or_intror R)
+                        end)
+         (fun RHS => match RHS with
+                     | conj PQ PR => match PQ with
+                                     | or_introl P => or_introl P
+                                     | or_intror Q => match PR with 
+                                                      | or_introl P => or_introl P
+                                                      | or_intror R => or_intror (conj Q R)
+                                                      end
+                                     end
+                     end).
+
+
+Check or_distributes_over_and. 
+
+    (** [it need to be a conj then match two fun] *)
+
+Check not.
+Print not. 
 
 (** **** Exercise: 3 stars, standard (negations) *)
 Definition double_neg : forall P : Prop,
     P -> ~~P
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+    fun (P : Prop) (PP : P) (NP: not P) => NP PP. 
 
 Definition contradiction_implies_anything : forall P Q : Prop,
     (P /\ ~P) -> Q
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+  fun (P Q: Prop) H => match H with
+                       | conj PP NP => match (NP PP) with end
+                       end. 
+
+Check contradiction_implies_anything.
 
 Definition de_morgan_not_or : forall P Q : Prop,
     ~ (P \/ Q) -> ~P /\ ~Q
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
-(** [] *)
+    (* REPLACE THIS LINE WITH ":= _your_definition_ ." *):=
+    fun (P Q: Prop) H => conj
+      (fun LHS => H (or_introl LHS))
+      (fun RHS => H (or_intror RHS)).
+
+Check de_morgan_not_or. 
+    (* fun (P Q: Prop) H  =>  
+      conj 
+      (Admitted) 
+       (Admitted). *)
+                                  
+(** [should be conj of two functions] *)
 
 (** **** Exercise: 2 stars, standard (currying) *)
 Definition curry : forall P Q R : Prop,
     ((P /\ Q) -> R) -> (P -> (Q -> R))
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+    (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+    fun (P Q R : Prop) H => fun PP => fun QQ => H (conj PP QQ).  
 
 Definition uncurry : forall P Q R : Prop,
     (P -> (Q -> R)) -> ((P /\ Q) -> R)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *):=
+  fun (P Q R : Prop) H => fun PQ => match PQ with 
+                                    | conj P Q => H P Q
+                                    end. 
 (** [] *)
 
 (* ################################################################# *)
@@ -964,11 +1009,15 @@ Definition propositional_extensionality : Prop :=
 
     Prove the following consequence of propositional extensionality. *)
 
+Search (_\/_). 
 Theorem pe_implies_or_eq :
   propositional_extensionality ->
   forall (P Q : Prop), (P \/ Q) = (Q \/ P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. 
+  apply H.
+  apply or_comm with (A:=P)(B:=Q). 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 1 star, advanced (pe_implies_true_eq)
@@ -976,10 +1025,15 @@ Proof.
     Prove that if a proposition [P] is provable, then it is equal to
     [True] -- as a consequence of propositional extensionality. *)
 
+Search (_<->_). 
 Lemma pe_implies_true_eq :
   propositional_extensionality ->
   forall (P : Prop), P -> True = P.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) intros.
+ apply H.
+ apply iff_sym. 
+ apply provable_equiv_true with (P:=P). apply H0. 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (pe_implies_pi)
@@ -1002,7 +1056,20 @@ Definition proof_irrelevance : Prop :=
 
 Theorem pe_implies_pi :
   propositional_extensionality -> proof_irrelevance.
-Proof. (* FILL IN HERE *) Admitted.
-(** [] *)
+Proof. (* FILL IN HERE *) 
+  intros. 
+  unfold proof_irrelevance.
+  intros. 
+  assert (P <-> True).  
+  - split. 
+    * intros. exact I. 
+    * intros. exact pf2.
+  - specialize (H P True H0). 
+    subst.
+    rewrite pf2.
+    rewrite pf1.
+    reflexivity. 
+  Qed. 
+    (** [] *)
 
 (* 2026-08-24 09:55 *)
