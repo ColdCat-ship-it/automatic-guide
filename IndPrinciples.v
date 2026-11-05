@@ -1071,7 +1071,18 @@ Definition better_t_tree_ind : better_t_tree_ind_type
 
 Theorem reflect_involution : forall (X : Type) (t : t_tree X),
     reflect (reflect t) = t.
-Proof. (* FILL IN HERE *) Admitted.
+Proof.
+  intros X.
+  apply (better_t_tree_ind X).
+  - reflexivity.
+  - intros p.
+    destruct p as [[l v] r].
+    simpl.
+    intros IHl IHr.
+    rewrite IHl.
+    rewrite IHr.
+    reflexivity.
+Qed.
 
 (** [] *)
 
