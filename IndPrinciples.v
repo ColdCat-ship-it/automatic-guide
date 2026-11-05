@@ -78,13 +78,15 @@ Proof.
 
     Complete this proof without using the [induction] tactic. *)
 
+    Search (S( _ + _ )).
 Theorem plus_one_r' : forall n:nat,
   n + 1 = S n.
 Proof.
   (* FILL IN HERE *)  
   apply nat_ind.
   - reflexivity. 
-  - intros. rewrite <- H.   
+  - intros. rewrite <- H. rewrite <- plus_Sn_m. rewrite <- H. reflexivity.     
+Qed. 
 (** [] *)
 
 (** Rocq generates induction principles for every datatype
@@ -193,6 +195,7 @@ Inductive booltree : Type :=
   | bt_leaf (b : bool)
   | bt_branch (b : bool) (t1 t2 : booltree).
 
+Check booltree_ind. 
 (** What is the induction principle for [booltree]? Of course you could
    ask Rocq, but try not to do that. Instead, write it down yourself on
    paper. Then look at the definition of [booltree_ind_type], below.
@@ -201,16 +204,18 @@ Inductive booltree : Type :=
    you wrote on paper. *)
 
 Definition booltree_property_type : Type := booltree -> Prop.
-
-Admitted. 
+ 
 Definition base_case (P : booltree_property_type) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+  P bt_empty. 
 
 Definition leaf_case (P : booltree_property_type) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+  forall b : bool, P (bt_leaf b). 
 
 Definition branch_case (P : booltree_property_type) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) :=
+  forall b : bool, forall t1 : booltree, P t1 -> forall t2 : booltree, P t2 -> P (bt_branch b t1 t2).
 
 Definition booltree_ind_type :=
   forall (P : booltree_property_type),
@@ -226,7 +231,9 @@ Definition booltree_ind_type :=
     same type as what you just defined. *)
 
 Theorem booltree_ind_type_correct : booltree_ind_type.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) 
+  exact booltree_ind.
+Qed. 
 
 (** [] *)
 
@@ -244,7 +251,11 @@ Proof. (* FILL IN HERE *) Admitted.
 
 Inductive Toy : Type :=
   (* FILL IN HERE *)
-.
+  | toy_b (b : bool)
+  | toy_nb (n : nat) (t : Toy) .
+
+Check Toy_ind. 
+
 
 (** Show that your definition is correct by proving the following theorem.
     You should be able to instantiate [f] and [g] with your two constructors,
@@ -257,8 +268,12 @@ Theorem Toy_correct : exists f g,
     (forall b : bool, P (f b)) ->
     (forall (n : nat) (t : Toy), P t -> P (g n t)) ->
     forall t : Toy, P t.
-Proof. (* FILL IN HERE *) Admitted.
-
+Proof. (* FILL IN HERE *) 
+  intros. 
+  exists toy_b.
+  exists toy_nb. 
+  exact Toy_ind.  
+Qed. 
 (** [] *)
 
 (* ################################################################# *)
@@ -317,6 +332,12 @@ Check tree_ind.
                forall n : nat, P (constr3 X m n)) ->
             forall m : mytype X, P m
 *)
+Inductive mytype (X:Type) : Type :=
+  | constr1 (x : X)
+  | constr2 (n : nat)
+  | constr3 (m : mytype X) (n : nat) .
+Check mytype_ind. 
+
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (foo)
@@ -332,6 +353,12 @@ Check tree_ind.
                (forall n : nat, P (f1 n)) -> P (quux X Y f1)) ->
              forall f2 : foo X Y, P f2
 *)
+Inductive foo (X Y : Type) : Type :=
+  | bar (x : X)
+  | baz (y : Y)
+  | quux (f1 : nat -> foo X Y) (n : nat).
+Check foo_ind. 
+
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (foo')
@@ -348,10 +375,10 @@ Inductive foo' (X:Type) : Type :=
      foo'_ind :
         forall (X : Type) (P : foo' X -> Prop),
               (forall (l : list X) (f : foo' X),
-                    _______________________ ->
-                    _______________________   ) ->
-             ___________________________________________ ->
-             forall f : foo' X, ________________________
+                    forall (l : list X) (f : foo' X), P f ->
+                    P (C1 X L F)   ) ->
+             P (C2 X)  ->
+             forall f : foo' X, P f
 *)
 
 (** [] *)
@@ -1013,14 +1040,27 @@ Proof.
     use. There are many possible answers. Recall that you can use
     [match] as part of the definition. *)
 
-Definition better_t_tree_ind_type : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition better_t_tree_ind_type : Prop (*Prop*)
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := forall (X : Type) (P : t_tree X -> Prop), 
+  (* base case *) P t_leaf -> 
+  (* inductive *) (forall tup : t_tree X * X * t_tree X,
+                    match tup with
+                    | (ltt, data, rtt) => P ltt -> P rtt -> P (t_branch tup)
+                    end) -> forall t : t_tree X, P t.
 
 (** Second, define the induction principle by giving a term of that
     type. Use the examples about [nat], above, as models. *)
 
 Definition better_t_tree_ind : better_t_tree_ind_type
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+  := fun X => fun P => fun P0 => fun Pind =>
+    fix f (t: t_tree X) := match t with 
+                                 | t_leaf => P0
+                                 | t_branch (l, v, r) => Pind (l, v, r) (f l) (f r)
+                                            end. 
+
+
 
 (** Finally, prove the theorem. If [induction...using] gives you an
     error about "Cannot recognize an induction scheme", don't worry
