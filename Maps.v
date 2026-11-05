@@ -48,6 +48,7 @@ Import ListNotations.
     addition operation defined in the standard library? *)
 
 Locate "+".
+Search (_+_).
 
 (** (There are several uses of the [+] notation, but only one for
     naturals.) *)
@@ -79,6 +80,13 @@ Check String.eqb_neq :
 Check String.eqb_spec :
   forall x y : string, reflect (x = y) (String.eqb x y).
 
+Print string. 
+Print Ascii.ascii. 
+
+Check String.eqb_refl. 
+Check String.eqb_eq.
+Check String.eqb_neq.
+Check String.eqb_spec. 
 (* ################################################################# *)
 (** * Total Maps *)
 
@@ -140,7 +148,7 @@ Definition examplemap :=
 Notation "'__' '!->' v" := (t_empty v)
   (at level 100, right associativity).
 
-Example example_empty := ( false).
+Example example_empty := (__ !-> false).
 
 (** We next introduce a symbolic notation for extending an existing
     map with a new binding. *)
@@ -187,20 +195,44 @@ Proof. reflexivity. Qed.
 Lemma t_apply_empty : forall (A : Type) (x : string) (v : A),
   (__ !-> v) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+  intros. 
+  unfold t_empty.
+  reflexivity. 
+Qed.
 (** [] *)
 
+Fail Search functional_extentionality. 
 (** **** Exercise: 2 stars, standard, optional (t_update_eq)
 
     Next, if we update a map [m] at a key [x] with a new value [v]
     and then look up [x] in the map resulting from the [update], we
     get back [v]: *)
 
+Search String.
+Check String.eqb_refl.  
+Check String. 
 Lemma t_update_eq : forall (A : Type) (m : total_map A) x v,
   (x !-> v ; m) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. 
+  unfold t_update. 
+  rewrite  String.eqb_refl.
+  reflexivity. 
+Qed. 
 (** [] *)
+
+
+Lemma t_update_eq' : forall (A : Type) (m : total_map A) x v,
+  (x !-> v ; m) x = v.
+Proof.
+  intros.
+  unfold t_update. 
+  destruct (String.eqb_spec x x). 
+  - reflexivity. 
+  - exfalso. apply n. reflexivity.      
+Qed. 
+
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq)
 
@@ -223,10 +255,17 @@ Proof.
     to any key) as the simpler map obtained by performing just
     the second [update] on [m]: *)
 
+  Check functional_extensionality. 
 Lemma t_update_shadow : forall (A : Type) (m : total_map A) x v1 v2,
   (x !-> v2 ; x !-> v1 ; m) = (x !-> v2 ; m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+  intros.
+  unfold t_update. 
+  apply functional_extensionality. 
+  intros.
+  destruct (String.eqb_spec x x0); reflexivity. 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (t_update_same)
