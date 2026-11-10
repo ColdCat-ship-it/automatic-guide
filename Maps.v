@@ -244,7 +244,12 @@ Theorem t_update_neq : forall (A : Type) (m : total_map A) x1 x2 v,
   x1 <> x2 ->
   (x1 !-> v ; m) x2 = m x2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  unfold t_update. 
+  destruct (String.eqb_spec x1 x2). 
+  - unfold not in H. exfalso. apply H. exact e.      
+  - reflexivity. 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_shadow)
@@ -282,7 +287,13 @@ Qed.
 Theorem t_update_same : forall (A : Type) (m : total_map A) x,
   (x !-> m x ; m) = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. 
+  unfold t_update. 
+  apply functional_extensionality. 
+  intros. destruct(String.eqb_spec x x0).
+  - rewrite e. reflexivity. 
+  - reflexivity. 
+Qed. 
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (t_update_permute)
@@ -298,7 +309,13 @@ Theorem t_update_permute : forall (A : Type) (m : total_map A)
   =
   (x2 !-> v2 ; x1 !-> v1 ; m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros.
+  unfold t_update. 
+  apply functional_extensionality. 
+  intros. destruct (String.eqb_spec x1 x); destruct (String.eqb_spec x2 x); try auto.
+  - unfold not in H. exfalso. apply H. subst. auto.   
+Qed.
+
 (** [] *)
 
 (* ################################################################# *)
@@ -348,6 +365,8 @@ Qed.
     Rocq's global "hint database" allows proof-automation tactics such
     as [auto] to find it. *)
 #[global] Hint Resolve update_eq : core.
+
+Check t_update_neq. 
 
 Theorem update_neq : forall (A : Type) (m : partial_map A) x1 x2 v,
   x2 <> x1 ->
