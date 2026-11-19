@@ -87,6 +87,9 @@ Check String.eqb_refl.
 Check String.eqb_eq.
 Check String.eqb_neq.
 Check String.eqb_spec. 
+
+Print reflect. 
+Check reflect_ind. 
 (* ################################################################# *)
 (** * Total Maps *)
 
@@ -233,6 +236,17 @@ Proof.
   - exfalso. apply n. reflexivity.      
 Qed. 
 
+Lemma t_update_eq'' : forall (A : Type) (m : total_map A) x v,
+  (x !-> v ; m) x = v.
+Proof.
+  intros. unfold t_update.
+  induction (String.eqb_spec x x).
+  - reflexivity. 
+  - exfalso. apply n. reflexivity.      
+Qed.
+
+Print t_update_eq'. 
+Print t_update_eq''.
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq)
 
@@ -344,6 +358,8 @@ Notation "x '|->' v" := (update empty x v)
 Definition examplepmap :=
   ("Church" |-> true ; "Turing" |-> false).
 
+Print examplepmap. 
+
 (** We now straightforwardly lift all of the basic lemmas about total
     maps to partial maps.  *)
 
@@ -429,6 +445,17 @@ Proof.
     + apply Hxy.
 Qed.
 
+Lemma includedin_update' : forall (A : Type) (m m' : partial_map A)
+                                 (x : string) (vx : A),
+  includedin m m' ->
+  includedin (x |-> vx ; m) (x |-> vx ; m').
+Proof.
+  unfold includedin, update, t_update. 
+  intros. 
+  destruct (eqb_spec x x0); auto. 
+Qed. 
+  (* - subst. apply H0. 
+  - apply H. exact H0. *) 
 (** This property is quite useful for reasoning about languages with
     variable binding -- e.g., the Simply Typed Lambda Calculus, which
     we will see in _Programming Language Foundations_, where maps are
@@ -436,3 +463,11 @@ Qed.
     given scope. *)
 
 (* 2026-08-24 09:55 *)
+
+Check eq_ind. 
+Check eq_ind_r. 
+
+
+
+
+

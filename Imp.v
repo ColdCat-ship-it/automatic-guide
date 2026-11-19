@@ -212,6 +212,12 @@ Proof.
   - (* AMult *)
     simpl. rewrite IHa1. rewrite IHa2. reflexivity.  Qed.
 
+
+Theorem optimize_0plus_sound_playaround': forall a,
+  aeval (optimize_0plus a) = aeval a.
+Proof.
+  intros a. induction a; try simpl in *; try subst; try auto.  
+Admitted. 
 (* ################################################################# *)
 (** * Rocq Automation *)
 
@@ -410,6 +416,8 @@ Proof.
     Here is an example proving that [10] is in a long list using
     [repeat]. *)
 
+      Check In.
+Print In. 
 Theorem In10 : In 10 [1;2;3;4;5;6;7;8;9;10].
 Proof.
   repeat (try (left; reflexivity); right).
@@ -462,8 +470,20 @@ Admitted.
     it is sound.  Use the tacticals we've just seen to make the proof
     as short and elegant as possible. *)
 
+Print bexp.
+Print aexp. 
 Fixpoint optimize_0plus_b (b : bexp) : bexp
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." := 
+  match b with
+  | BTrue       => BTrue
+  | BFalse      => BFalse
+  | BEq a1 a2   => BEq (optimize_0plus a1) (optimize_0plus a2)
+  | BNeq a1 a2  => BNeq (optimize_0plus a1) (optimize_0plus a2)
+  | BLe a1 a2   => BLe (optimize_0plus a1) (optimize_0plus a2)
+  | BGt a1 a2   => BGt (optimize_0plus a1) (optimize_0plus a2)
+  | BNot b1     => BNot (BEq (optimize_0plus b1) BTrue)
+  | BAnd b1 b2  => BAnd (beval b1) (beval b2)
+     end.*) . Admitted. 
 
 Example optimize_0plus_b_test1:
   optimize_0plus_b (BNot (BGt (APlus (ANum 0) (ANum 4)) (ANum 8))) =
@@ -612,6 +632,8 @@ Qed.
        [Inductive] definition in the current environment) that can be
        applied to solve the current goal.  If one is found, behave
        like [apply c].
+
+       remember 
 
     We'll see examples of all of these as we go along. *)
 
@@ -850,6 +872,10 @@ Proof.
        try apply IHa1; try apply IHa2; reflexivity.
 Qed.
 
+Print intuition. 
+Print trivial. 
+Print assumption. 
+  
 (** **** Exercise: 3 stars, standard (bevalR)
 
     Write a relation [bevalR] in the same style as
