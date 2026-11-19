@@ -1800,14 +1800,44 @@ Fixpoint no_whiles (c : com) : bool :=
     while loops.  Then prove its equivalence with [no_whiles]. *)
 
 Inductive no_whilesR: com -> Prop :=
- (* FILL IN HERE *)
-.
+| NW_Skip : no_whilesR CSkip
+| NW_Asgn (x : string) (a : aexp) :
+    no_whilesR (CAsgn x a)
+| NW_Seq (c1 c2 : com) :
+    no_whilesR c1 ->
+    no_whilesR c2 ->
+    no_whilesR (CSeq c1 c2)
+| NW_If (b : bexp) (c1 c2 : com) :
+    no_whilesR c1 ->
+    no_whilesR c2 ->
+    no_whilesR (CIf b c1 c2).
 
 Theorem no_whiles_eqv:
   forall c, no_whiles c = true <-> no_whilesR c.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  intros c. split.
+  - induction c.
+    + intros H. apply NW_Skip.
+    + intros H. apply NW_Asgn.
+    + simpl. intros H.
+      apply andb_true_iff in H.
+      destruct H as [H1 H2].
+      apply NW_Seq.
+      * apply IHc1. apply H1.
+      * apply IHc2. apply H2.
+    + simpl. intros H.
+      apply andb_true_iff in H.
+      destruct H as [H1 H2].
+      apply NW_If.
+      * apply IHc1. apply H1.
+      * apply IHc2. apply H2.
+    + simpl. intros H. discriminate H.
+  - intros H. induction H.
+    + reflexivity.
+    + reflexivity.
+    + simpl. rewrite IHno_whilesR1, IHno_whilesR2. reflexivity.
+    + simpl. rewrite IHno_whilesR1, IHno_whilesR2. reflexivity.
+Qed.
 
 (** **** Exercise: 4 stars, standard (no_whiles_terminating)
 
