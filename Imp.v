@@ -1917,9 +1917,9 @@ Fixpoint s_execute (st : state) (stack : list nat)
       match op, stack with
       | SPush top, _ => top :: stack
       | SLoad X, _ => (st X) :: stack
-      | SPlus, a :: b :: s => (a + b) :: s
+      | SPlus, a :: b :: s => (b + a) :: s
       | SMinus, a :: b :: s => (b - a) :: s
-      | SMult, a :: b :: s => (a * b) :: s
+      | SMult, a :: b :: s => (b * a) :: s
       | _, _ => stack
       end in s_execute st pop prog'
   end. 
@@ -1994,15 +1994,16 @@ Lemma s_compile_correct_aux : forall st e stack,
   s_execute st stack (s_compile e) = aeval st e :: stack.
 Proof.
   (* FILL IN HERE *) intros. 
-  generalize stack; induction e; try reflexivity.  
-  - intros. simpl. repeat rewrite execute_app. rewrite IHe1, IHe2. simpl. 
-
+  generalize stack; induction e; try reflexivity;  
+  try (intros; simpl; repeat rewrite execute_app; rewrite IHe1, IHe2; simpl; reflexivity).  
+Qed. 
 (** The main theorem should be a very easy corollary of that lemma. *)
 
 Theorem s_compile_correct : forall (st : state) (e : aexp),
   s_execute st [] (s_compile e) = [ aeval st e ].
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) intros. repeat rewrite s_compile_correct_aux. reflexivity.  
+Qed. 
 
 (** [] *)
 
