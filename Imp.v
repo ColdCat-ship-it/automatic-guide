@@ -473,7 +473,7 @@ Admitted.
 Print bexp.
 Print aexp. 
 Fixpoint optimize_0plus_b (b : bexp) : bexp
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." := 
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *) := 
   match b with
   | BTrue       => BTrue
   | BFalse      => BFalse
@@ -481,24 +481,30 @@ Fixpoint optimize_0plus_b (b : bexp) : bexp
   | BNeq a1 a2  => BNeq (optimize_0plus a1) (optimize_0plus a2)
   | BLe a1 a2   => BLe (optimize_0plus a1) (optimize_0plus a2)
   | BGt a1 a2   => BGt (optimize_0plus a1) (optimize_0plus a2)
-  | BNot b1     => BNot (BEq (optimize_0plus b1) BTrue)
-  | BAnd b1 b2  => BAnd (beval b1) (beval b2)
-     end.*) . Admitted. 
+  | BNot b1     => BNot (optimize_0plus_b b1)
+  | BAnd b1 b2  => BAnd (optimize_0plus_b b1) (optimize_0plus_b b2)
+     end.
 
 Example optimize_0plus_b_test1:
   optimize_0plus_b (BNot (BGt (APlus (ANum 0) (ANum 4)) (ANum 8))) =
                    (BNot (BGt (ANum 4) (ANum 8))).
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) 
+  intros. reflexivity. Qed.  
 
 Example optimize_0plus_b_test2:
   optimize_0plus_b (BAnd (BLe (APlus (ANum 0) (ANum 4)) (ANum 5)) BTrue) =
                    (BAnd (BLe (ANum 4) (ANum 5)) BTrue).
-Proof. (* FILL IN HERE *) Admitted.
+Proof. (* FILL IN HERE *) 
+  intros. reflexivity. Qed.  
 
 Theorem optimize_0plus_b_sound : forall b,
   beval (optimize_0plus_b b) = beval b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intro b. 
+  induction b; try (trivial; simpl; repeat rewrite optimize_0plus_sound; reflexivity).
+  - simpl. rewrite IHb. reflexivity.
+  - simpl. rewrite IHb1. rewrite IHb2. reflexivity.  
+Qed.      
 (** [] *)
 
 (** **** Exercise: 4 stars, standard, optional (optimize)
@@ -1583,6 +1589,7 @@ Proof.
     + apply E_Asgn. reflexivity.
 Qed.
 
+Print ceval. 
 (** **** Exercise: 2 stars, standard (ceval_example2) *)
 Example ceval_example2:
   empty_st =[
@@ -1591,7 +1598,13 @@ Example ceval_example2:
     Z := 2
   ]=> (Z !-> 2 ; Y !-> 1 ; X !-> 0).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) 
+  apply E_Seq with (X !-> 0).
+  - apply E_Asgn. reflexivity.
+  - apply E_Seq with (Y !-> 1; X !-> 0); apply E_Asgn; reflexivity. 
+Qed. 
+
+
 (** [] *)
 
 Set Printing Implicit.
@@ -1678,7 +1691,7 @@ Proof.
   intros st n st' HX Heval.
 
   (** Inverting [Heval] essentially forces Rocq to expand one step of
-      the [ceval] computation -- in this case revealing that [st']
+      <F5><F5>the [ceval] computation -- in this case revealing that [st']
       must be [st] extended with the new value of [X], since [plus2]
       is an assignment. *)
 
@@ -1708,7 +1721,10 @@ Proof.
       contradictory and so can be solved in one step with
       [discriminate]. *)
 
-  (* FILL IN HERE *) Admitted.
+  (* FILL IN HERE *) induction contra; try discriminate.   
+  - inversion Heqloopdef. subst. discriminate.   
+  - apply IHcontra2. exact Heqloopdef.
+Qed. 
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (no_whiles_eqv)
@@ -1736,6 +1752,7 @@ Fixpoint no_whiles (c : com) : bool :=
 
 Inductive no_whilesR: com -> Prop :=
  (* FILL IN HERE *)
+
 .
 
 Theorem no_whiles_eqv:
