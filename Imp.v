@@ -1837,8 +1837,39 @@ Qed.
     State and prove a theorem [no_whiles_terminating] that says this.
 
     Use either [no_whiles] or [no_whilesR], as you prefer. *)
-
-(* FILL IN HERE *)
+Theorem no_whiles_terminating :
+  forall c, no_whilesR c ->
+  forall st, exists st', st =[ c ]=> st'.
+Proof.
+  intros c H.
+  induction H.
+  - intros st.
+    exists st.
+    apply E_Skip.
+  - intros st.
+    exists (x !-> aeval st a ; st).
+    apply E_Asgn.
+    reflexivity.
+  - intros st.
+    destruct (IHno_whilesR1 st) as [middle Hfirst].
+    destruct (IHno_whilesR2 middle) as [final Hsecond].
+    exists final.
+    apply E_Seq with (st' := middle).
+    + apply Hfirst.
+    + apply Hsecond.
+  - intros st.
+    destruct (beval st b) eqn:Htest.
+    + destruct (IHno_whilesR1 st) as [final Hbranch].
+      exists final.
+      apply E_IfTrue.
+      * apply Htest.
+      * apply Hbranch.
+    + destruct (IHno_whilesR2 st) as [final Hbranch].
+      exists final.
+      apply E_IfFalse.
+      * apply Htest.
+      * apply Hbranch.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_no_whiles_terminating : option (nat*string) := None.
