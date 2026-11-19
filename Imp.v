@@ -295,7 +295,6 @@ Proof.
   (* and do [reflexivity] on each resulting subgoal *)
   reflexivity.
 Qed.
-
 (** Using [try] and [;] together, we can get rid of the repetition in
     the proof that was bothering us a little while ago. *)
 
@@ -883,14 +882,80 @@ Print assumption.
 
 Reserved Notation "e '==>b' b" (at level 90, left associativity).
 Inductive bevalR: bexp -> bool -> Prop :=
-(* FILL IN HERE *)
+| E_BTrue : BTrue ==>b true
+| E_BFalse : BFalse ==>b false
+| E_BEq (a1 a2 : aexp) (n1 n2 : nat) :
+    (a1 ==> n1) ->
+    (a2 ==> n2) ->
+    (BEq a1 a2 ==>b (n1 =? n2))
+| E_BNeq (a1 a2 : aexp) (n1 n2 : nat) :
+    (a1 ==> n1) -> (a2 ==> n2) ->
+    (BNeq a1 a2 ==>b negb (n1 =? n2))
+| E_BLe (a1 a2 : aexp) (n1 n2 : nat) :
+    (a1 ==> n1) -> (a2 ==> n2) ->
+    (BLe a1 a2 ==>b (n1 <=? n2))
+| E_BGt (a1 a2 : aexp) (n1 n2 : nat) :
+    (a1 ==> n1) -> (a2 ==> n2) ->
+    (BGt a1 a2 ==>b negb (n1 <=? n2))
+| E_BNot (b : bexp) (v : bool) :
+    (b ==>b v) ->
+    (BNot b ==>b negb v)
+| E_BAnd (b1 b2 : bexp) (v1 v2 : bool) :
+    (b1 ==>b v1) -> (b2 ==>b v2) ->
+    (BAnd b1 b2 ==>b andb v1 v2)
 where "e '==>b' b" := (bevalR e b) : type_scope
 .
 
 Lemma bevalR_iff_beval : forall b bv,
   b ==>b bv <-> beval b = bv.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. split.
+  - intros. induction H.
+    + reflexivity.
+    + reflexivity.
+    + simpl.
+      apply aevalR_iff_aeval in H.
+      apply aevalR_iff_aeval in H0.
+      rewrite H, H0.
+      reflexivity.
+    + simpl.
+      apply aevalR_iff_aeval in H.
+      apply aevalR_iff_aeval in H0.
+      rewrite H, H0.
+      reflexivity.
+    + simpl.
+      apply aevalR_iff_aeval in H.
+      apply aevalR_iff_aeval in H0.
+      rewrite H, H0.
+      reflexivity.
+    + simpl.
+      apply aevalR_iff_aeval in H.
+      apply aevalR_iff_aeval in H0.
+      rewrite H, H0.
+      reflexivity.
+    + simpl. rewrite IHbevalR. reflexivity.
+    + simpl. rewrite IHbevalR1, IHbevalR2. reflexivity.
+  - intros. induction H. induction b.
+    + apply E_BTrue.
+    + apply E_BFalse.
+    + simpl. apply E_BEq with (n1 := aeval a1) (n2 := aeval a2).
+      * apply aevalR_iff_aeval. reflexivity.
+      * apply aevalR_iff_aeval. reflexivity.
+    + simpl. apply E_BNeq with (n1 := aeval a1) (n2 := aeval a2).
+      * apply aevalR_iff_aeval. reflexivity.
+      * apply aevalR_iff_aeval. reflexivity.
+    + simpl. apply E_BLe with (n1 := aeval a1) (n2 := aeval a2).
+      * apply aevalR_iff_aeval. reflexivity.
+      * apply aevalR_iff_aeval. reflexivity.
+    + simpl. apply E_BGt with (n1 := aeval a1) (n2 := aeval a2).
+      * apply aevalR_iff_aeval. reflexivity.
+      * apply aevalR_iff_aeval. reflexivity.
+    + simpl. apply E_BNot. assumption.
+    + simpl. apply E_BAnd.
+      * assumption.
+      * assumption.
+Qed.
+
 (** [] *)
 
 End AExp.
